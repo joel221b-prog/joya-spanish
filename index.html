@@ -31,6 +31,7 @@
     body { font-family: 'Noto Sans KR', sans-serif; background: var(--md-surface); color: var(--md-on-surface); min-height: 100vh; }
 
     .header { background: white; border-bottom: 1px solid var(--md-outline-variant); padding: 0 20px; height: 64px; display: flex; align-items: center; gap: 12px; position: sticky; top: 0; z-index: 10; }
+    .header-version { margin-left: auto; font-size: 10px; color: #C4B8D4; letter-spacing: 0.03em; }
     .header-icon { width: 40px; height: 40px; background: var(--md-primary-container); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 20px; }
     .header-title { font-size: 18px; font-weight: 700; color: var(--md-primary); }
     .header-sub { font-size: 11px; color: var(--md-on-surface-variant); margin-top: 1px; }
@@ -40,7 +41,7 @@
     .segment-wrap { display: flex; background: var(--md-surface-variant); border-radius: 28px; padding: 4px; margin-bottom: 20px; gap: 2px; }
     .seg-btn { flex: 1; display: flex; align-items: center; justify-content: center; gap: 6px; padding: 10px 16px; border-radius: 24px; border: none; background: transparent; cursor: pointer; font-size: 14px; font-weight: 500; color: var(--md-on-surface-variant); font-family: 'Noto Sans KR', sans-serif; transition: all 0.2s; }
     .seg-btn.active { background: var(--md-primary); color: white; box-shadow: var(--shadow-sm); }
-    .seg-btn .flag { font-size: 17px; }
+    .seg-btn .flag { font-size: 20px; }
     .seg-arrow { font-size: 16px; color: var(--md-on-surface-variant); display: flex; align-items: center; padding: 0 2px; }
 
     .input-card { background: white; border-radius: 16px; border: 1.5px solid var(--md-outline-variant); padding: 16px; transition: border-color 0.2s, box-shadow 0.2s; }
@@ -109,14 +110,16 @@
   <div>
     <div class="header-title">jOYA</div>
     <div class="header-sub">스페인어 공부 번역기</div>
+
   </div>
+  <span class="header-version">ver 1.0 (20260510)</span>
 </header>
 
 <main class="main">
   <div class="segment-wrap">
-    <button class="seg-btn active" id="btn-es" onclick="setMode('es')"><span class="flag">🇪🇸</span> 스페인어</button>
+    <button class="seg-btn active" id="btn-es" onclick="setMode('es')"><img src="https://flagcdn.com/24x18/es.png" alt="ES" style="border-radius:2px"> 스페인어</button>
     <span class="seg-arrow">⇄</span>
-    <button class="seg-btn" id="btn-ko" onclick="setMode('ko')"><span class="flag">🇰🇷</span> 한국어</button>
+    <button class="seg-btn" id="btn-ko" onclick="setMode('ko')"><img src="https://flagcdn.com/24x18/kr.png" alt="KR" style="border-radius:2px"> 한국어</button>
   </div>
 
   <div class="input-card">
@@ -250,7 +253,7 @@
     document.getElementById('res-grammar').innerHTML = '<span class="placeholder">로딩 중...</span>';
 
     const isES = mode === 'es';
-    const systemPrompt = `You are a Spanish language tutor. Respond ONLY in valid JSON. No markdown, no code blocks.
+    const systemPrompt = `You are a Spanish language tutor helping Korean students. Respond ONLY in valid JSON. No markdown, no code blocks. ALL Korean fields (explanation, notes, meaning, error, desc) MUST be written in Korean (한국어) only. Never use Spanish or English in Korean fields.
 
 User inputs a ${isES ? 'Spanish' : 'Korean'} sentence.
 
@@ -281,7 +284,7 @@ Return exactly:
         {"pronoun": "ellos", "form": "..."}
       ]
     }],
-    "notes": "Korean grammar notes"
+    "notes": "반드시 한국어로 작성된 문법 노트. MUST be written in Korean language only."
   }
 }`;
 
