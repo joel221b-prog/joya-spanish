@@ -161,24 +161,34 @@
     setLoading(true);
     document.getElementById('results').classList.add('visible');
     setText('res-translation', '분석 중...');
-    setText('res-correction', '...');
+    document.getElementById('res-correction').innerHTML = '...';
     document.getElementById('res-examples').innerHTML = '<span class="placeholder">로딩 중...</span>';
     document.getElementById('res-grammar').innerHTML = '<span class="placeholder">로딩 중...</span>';
 
     const isES = mode === 'es';
     
-    // Gemini 프롬프트 구성
+    // 특수문자/이모지 보존 및 교정 포맷 구조화 프롬프트
     const prompt = `You are a professional Spanish tutor. Analyze the ${isES ? 'Spanish' : 'Korean'} input: "${text}"
-Respond ONLY with a valid JSON object. 
+
+[STRICT RULES]
+1. Respond ONLY with a valid JSON object.
+2. PRESERVE all emojis and special characters exactly in all fields.
+3. For the "correction" field, use this structure in Korean:
+   - 원문: (Input text)
+   - 상태: (Natural or Needs Fix)
+   - 수정문: (Corrected version)
+   - 설명: (Brief explanation)
+
+JSON Structure:
 {
-  "translation": "Korean translation",
-  "correction": "Korean explanation of grammar/naturalness",
+  "translation": "Translation with emojis",
+  "correction": "Structured feedback as requested",
   "examples": [{"es": "...", "ko": "..."}],
   "grammar": {
     "verbs": [{
       "infinitive": "...",
       "meaning": "...",
-      "explanation": "Korean explanation",
+      "explanation": "...",
       "conjugations": [
         {"pronoun": "yo", "form": "..."},
         {"pronoun": "tú", "form": "..."},
@@ -188,7 +198,7 @@ Respond ONLY with a valid JSON object.
         {"pronoun": "ellos/ellas", "form": "..."}
       ]
     }],
-    "notes": "Additional tips in Korean"
+    "notes": "..."
   }
 }`;
 
@@ -199,24 +209,19 @@ Respond ONLY with a valid JSON object.
         body: JSON.stringify({ prompt: prompt })
       });
 
-      if (!resp.ok) {
-        const errData = await resp.json();
-        throw new Error(errData.error || 'Server Error');
-      }
-
       const data = await resp.json();
-      
-      // 제미나이 응답 파싱
+      if (data.error) throw new Error(data.error);
+
       const parsed = JSON.parse(data.content);
 
       setText('res-translation', parsed.translation || '-');
-      setText('res-correction', parsed.correction || '-');
+      // 줄바꿈 처리하여 교정 섹션 표시
+      document.getElementById('res-correction').innerHTML = (parsed.correction || '-').replace(/\n/g, '<br>');
       renderExamples(parsed.examples || []);
       renderGrammar(parsed.grammar || {});
     } catch (e) {
       console.error(e);
-      setText('res-translation', '오류가 발생했습니다: ' + e.message);
-      setText('res-correction', '-');
+      setText('res-translation', '오류 발생: ' + e.message);
     } finally {
       setLoading(false);
     }
