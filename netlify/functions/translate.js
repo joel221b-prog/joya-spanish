@@ -23,7 +23,8 @@ exports.handler = async (event) => {
     const userPrompt = body.prompt + "\n\nIMPORTANT: Return ONLY a raw JSON object. Do not use markdown blocks. Preserve all emojis and special symbols exactly.";
 
     // [수정 포인트] 모델 경로에 'models/'를 명시하고 v1beta 엔드포인트를 사용합니다.
-    const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${API_KEY}`;
+   const url = `https://generativelanguage.googleapis.com/v1/models/gemini-1.5-flash:generateContent?key=${API_KEY}`;
+
 
     const response = await fetch(url, {
       method: 'POST',
