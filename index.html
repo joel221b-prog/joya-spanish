@@ -1,0 +1,238 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>jOYA 스페인어 번역기</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Nanum+Gothic:wght@400;700;800&family=Playfair+Display:wght@600&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root {
+      --coral: #D85A30; --coral-light: #FAECE7; --coral-dark: #993C1D;
+      --green-light: #EAF3DE; --green-dark: #3B6D11;
+      --blue-light: #E6F1FB; --blue-dark: #185FA5;
+      --purple-light: #EEEDFE; --purple-dark: #534AB7;
+      --text: #1a1a1a; --text-muted: #666; --text-hint: #aaa;
+      --border: rgba(0,0,0,0.1); --border-strong: rgba(0,0,0,0.2);
+      --bg: #faf9f7; --surface: #ffffff; --radius: 10px;
+    }
+    body { font-family: 'Nanum Gothic', sans-serif; background: var(--bg); color: var(--text); min-height: 100vh; }
+    .site-header { background: white; border-bottom: 1px solid var(--border); padding: 14px 20px; display: flex; align-items: center; position: sticky; top: 0; z-index: 10; }
+    .logo { font-family: 'Playfair Display', serif; font-size: 22px; color: var(--coral); }
+    .logo-sub { font-size: 12px; color: var(--text-muted); margin-top: 1px; }
+    .main { max-width: 520px; margin: 0 auto; padding: 24px 16px 60px; }
+    .mode-toggle { display: flex; align-items: center; gap: 8px; margin-bottom: 16px; }
+    .mode-btn { display: flex; align-items: center; gap: 6px; padding: 8px 18px; border-radius: 24px; border: 1.5px solid var(--border-strong); background: white; cursor: pointer; font-size: 13px; font-weight: 700; color: var(--text-muted); font-family: 'Nanum Gothic', sans-serif; transition: all 0.18s; }
+    .mode-btn.active { background: var(--coral); border-color: var(--coral); color: white; }
+    .mode-btn .flag { font-size: 16px; }
+    .mode-arrow { font-size: 18px; color: var(--text-hint); }
+    .input-wrap { display: flex; gap: 8px; margin-bottom: 6px; }
+    .input-wrap textarea { flex: 1; min-height: 56px; max-height: 150px; padding: 13px 15px; border: 1.5px solid var(--border-strong); border-radius: var(--radius); font-size: 15px; font-family: 'Nanum Gothic', sans-serif; color: var(--text); background: white; resize: none; line-height: 1.5; transition: border-color 0.15s; }
+    .input-wrap textarea:focus { outline: none; border-color: var(--coral); box-shadow: 0 0 0 3px rgba(216,90,48,0.1); }
+    .go-btn { padding: 0 20px; background: var(--coral); color: white; border: none; border-radius: var(--radius); font-size: 14px; font-weight: 800; cursor: pointer; font-family: 'Nanum Gothic', sans-serif; white-space: nowrap; transition: background 0.15s, transform 0.1s; min-width: 76px; display: flex; align-items: center; justify-content: center; }
+    .go-btn:hover { background: #c04d25; }
+    .go-btn:active { transform: scale(0.97); }
+    .go-btn:disabled { background: #ccc; cursor: default; }
+    .spinner { width: 16px; height: 16px; border: 2px solid rgba(255,255,255,0.35); border-top-color: white; border-radius: 50%; animation: spin 0.7s linear infinite; }
+    @keyframes spin { to { transform: rotate(360deg); } }
+    .hint { font-size: 12px; color: var(--text-hint); margin-bottom: 18px; }
+    .divider { border: none; border-top: 1px solid var(--border); margin: 4px 0 16px; }
+    .results { display: flex; flex-direction: column; gap: 12px; opacity: 0; transition: opacity 0.35s; }
+    .results.visible { opacity: 1; }
+    .card { border-radius: var(--radius); border: 1px solid var(--border); overflow: hidden; background: white; }
+    .card-head { padding: 8px 14px; font-size: 11.5px; font-weight: 800; letter-spacing: 0.05em; }
+    .card-body { padding: 12px 15px; font-size: 14px; line-height: 1.7; color: var(--text); min-height: 44px; }
+    .card-translation .card-head { background: var(--coral-light); color: var(--coral-dark); }
+    .card-correction .card-head { background: var(--green-light); color: var(--green-dark); }
+    .card-examples .card-head { background: var(--blue-light); color: var(--blue-dark); }
+    .card-grammar .card-head { background: var(--purple-light); color: var(--purple-dark); }
+    .card-grammar .card-body { min-height: 80px; }
+    .placeholder { color: var(--text-hint); font-size: 13px; font-style: italic; }
+    .error { color: #a32d2d; font-size: 13px; }
+    .ex-item { padding: 7px 0; border-bottom: 1px solid var(--border); }
+    .ex-item:last-child { border-bottom: none; padding-bottom: 0; }
+    .ex-es { font-size: 14px; font-weight: 700; }
+    .ex-ko { font-size: 12.5px; color: var(--text-muted); margin-top: 2px; }
+    .g-verb-title { font-size: 11px; font-weight: 800; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.07em; margin: 12px 0 5px; }
+    .g-verb-title:first-child { margin-top: 0; }
+    .g-verb-name { font-size: 15px; font-weight: 800; color: var(--purple-dark); }
+    .g-explain { font-size: 13px; line-height: 1.65; margin: 6px 0 8px; }
+    .conjugation-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 3px 14px; margin-bottom: 10px; font-size: 13px; }
+    .conj-row { padding: 3px 0; border-bottom: 1px solid var(--border); display: flex; gap: 6px; }
+    .conj-pronoun { color: var(--text-muted); min-width: 60px; }
+    .conj-form { font-weight: 700; }
+    .g-notes-label { font-size: 11px; font-weight: 800; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.07em; margin: 10px 0 5px; }
+    .g-notes { font-size: 13px; line-height: 1.65; }
+  </style>
+</head>
+<body>
+<header class="site-header">
+  <div>
+    <div class="logo">jOYA</div>
+    <div class="logo-sub">스페인어 공부 번역기</div>
+  </div>
+</header>
+<main class="main">
+  <div class="mode-toggle">
+    <button class="mode-btn active" id="btn-es" onclick="setMode('es')"><span class="flag">🇪🇸</span> 스페인어</button>
+    <span class="mode-arrow">⇄</span>
+    <button class="mode-btn" id="btn-ko" onclick="setMode('ko')"><span class="flag">🇰🇷</span> 한국어</button>
+  </div>
+  <div class="input-wrap">
+    <textarea id="input-text" placeholder="스페인어 문장을 입력하세요" rows="2"></textarea>
+    <button class="go-btn" id="go-btn" onclick="doTranslate()">번역</button>
+  </div>
+  <p class="hint" id="hint-text">스페인어를 입력하면 해석·교정·예제·동사 변환을 알려드려요 &nbsp;·&nbsp; Enter로 바로 번역</p>
+  <hr class="divider">
+  <div class="results" id="results">
+    <div class="card card-translation">
+      <div class="card-head">📖 해석 (원문)</div>
+      <div class="card-body" id="res-translation"><span class="placeholder">번역 결과가 여기 표시됩니다</span></div>
+    </div>
+    <div class="card card-correction">
+      <div class="card-head">✏️ 문장 교정</div>
+      <div class="card-body" id="res-correction"><span class="placeholder">교정 내용이 여기 표시됩니다</span></div>
+    </div>
+    <div class="card card-examples">
+      <div class="card-head">💬 예제</div>
+      <div class="card-body" id="res-examples"><span class="placeholder">관련 예제 문장이 여기 표시됩니다</span></div>
+    </div>
+    <div class="card card-grammar">
+      <div class="card-head">🔤 문법 상세 (동사 변환 설명)</div>
+      <div class="card-body" id="res-grammar"><span class="placeholder">동사 변환 및 문법 설명이 여기 표시됩니다</span></div>
+    </div>
+  </div>
+</main>
+<script>
+  let mode = 'es';
+
+  function setMode(m) {
+    mode = m;
+    document.getElementById('btn-es').classList.toggle('active', m === 'es');
+    document.getElementById('btn-ko').classList.toggle('active', m === 'ko');
+    document.getElementById('input-text').placeholder = m === 'es' ? '스페인어 문장을 입력하세요' : '한국어 문장을 입력하세요';
+    document.getElementById('hint-text').textContent = m === 'es'
+      ? '스페인어를 입력하면 해석·교정·예제·동사 변환을 알려드려요  ·  Enter로 바로 번역'
+      : '한국어를 입력하면 스페인어 번역과 문법 설명을 알려드려요  ·  Enter로 바로 번역';
+  }
+
+  function setLoading(on) {
+    const btn = document.getElementById('go-btn');
+    btn.disabled = on;
+    btn.innerHTML = on ? '<div class="spinner"></div>' : '번역';
+  }
+
+  function setText(id, text) { document.getElementById(id).textContent = text; }
+
+  function renderExamples(examples) {
+    const el = document.getElementById('res-examples');
+    if (!examples || !examples.length) { el.innerHTML = '<span class="placeholder">예제 없음</span>'; return; }
+    el.innerHTML = examples.map(e => `<div class="ex-item"><div class="ex-es">${e.es}</div><div class="ex-ko">${e.ko}</div></div>`).join('');
+  }
+
+  function renderGrammar(data) {
+    const el = document.getElementById('res-grammar');
+    let html = '';
+    if (data && data.verbs && data.verbs.length) {
+      data.verbs.forEach(v => {
+        html += `<p class="g-verb-title">동사</p>`;
+        html += `<p class="g-verb-name">${v.infinitive} <span style="font-size:13px;font-weight:400;color:var(--text-muted)">${v.meaning}</span></p>`;
+        html += `<p class="g-explain">${v.explanation}</p>`;
+        if (v.conjugations && v.conjugations.length) {
+          html += `<div class="conjugation-grid">`;
+          v.conjugations.forEach(c => {
+            html += `<div class="conj-row"><span class="conj-pronoun">${c.pronoun}</span><span class="conj-form">${c.form}</span></div>`;
+          });
+          html += `</div>`;
+        }
+      });
+    }
+    if (data && data.notes) {
+      html += `<p class="g-notes-label">문법 노트</p><p class="g-notes">${data.notes}</p>`;
+    }
+    el.innerHTML = html || '<span class="placeholder">동사 정보 없음</span>';
+  }
+
+  async function doTranslate() {
+    const text = document.getElementById('input-text').value.trim();
+    if (!text) return;
+
+    setLoading(true);
+    document.getElementById('results').classList.add('visible');
+    setText('res-translation', '분석 중...');
+    setText('res-correction', '...');
+    document.getElementById('res-examples').innerHTML = '<span class="placeholder">로딩 중...</span>';
+    document.getElementById('res-grammar').innerHTML = '<span class="placeholder">로딩 중...</span>';
+
+    const isES = mode === 'es';
+    const systemPrompt = `You are a Spanish language tutor assistant. Always respond ONLY in valid JSON, no markdown, no preamble.
+The user inputs a ${isES ? 'Spanish' : 'Korean'} sentence or word.
+Return this exact JSON structure:
+{
+  "translation": "${isES ? 'Korean translation of the Spanish input' : 'Spanish translation of the Korean input'}",
+  "correction": "${isES ? 'If there are grammar errors, provide the corrected Spanish sentence and briefly explain in Korean. If correct, say 자연스러운 문장입니다.' : 'Natural Spanish version with brief Korean explanation of adjustments.'}",
+  "examples": [
+    {"es": "Spanish example sentence", "ko": "Korean translation"},
+    {"es": "Spanish example sentence 2", "ko": "Korean translation 2"},
+    {"es": "Spanish example sentence 3", "ko": "Korean translation 3"}
+  ],
+  "grammar": {
+    "verbs": [
+      {
+        "infinitive": "verb infinitive form",
+        "meaning": "Korean meaning",
+        "explanation": "Korean explanation of tense/mood/person used",
+        "conjugations": [
+          {"pronoun": "yo", "form": "..."},
+          {"pronoun": "tú", "form": "..."},
+          {"pronoun": "él/ella", "form": "..."},
+          {"pronoun": "nosotros", "form": "..."},
+          {"pronoun": "vosotros", "form": "..."},
+          {"pronoun": "ellos", "form": "..."}
+        ]
+      }
+    ],
+    "notes": "Additional Korean grammar notes about this sentence"
+  }
+}`;
+
+    try {
+      const resp = await fetch('/.netlify/functions/translate', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          model: 'claude-sonnet-4-20250514',
+          max_tokens: 1200,
+          system: systemPrompt,
+          messages: [{ role: 'user', content: text }]
+        })
+      });
+
+      const data = await resp.json();
+      if (data.error) throw new Error(JSON.stringify(data.error));
+
+      const raw = data.content.map(b => b.text || '').join('');
+      const clean = raw.replace(/```json|```/g, '').trim();
+      const parsed = JSON.parse(clean);
+
+      setText('res-translation', parsed.translation || '-');
+      setText('res-correction', parsed.correction || '-');
+      renderExamples(parsed.examples || []);
+      renderGrammar(parsed.grammar || {});
+    } catch (e) {
+      setText('res-translation', '오류: ' + e.message);
+      setText('res-correction', '-');
+      document.getElementById('res-examples').innerHTML = '<span class="error">결과를 불러올 수 없습니다</span>';
+      document.getElementById('res-grammar').innerHTML = '<span class="error">결과를 불러올 수 없습니다</span>';
+    } finally {
+      setLoading(false);
+    }
+  }
+
+  document.getElementById('input-text').addEventListener('keydown', e => {
+    if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); doTranslate(); }
+  });
+</script>
+</body>
+</html>
