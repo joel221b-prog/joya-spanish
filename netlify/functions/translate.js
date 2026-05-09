@@ -1,5 +1,5 @@
 exports.handler = async (event) => {
-  // 1. CORS 및 옵션 요청 처리
+  // CORS 처리
   if (event.httpMethod === 'OPTIONS') {
     return {
       statusCode: 200,
@@ -19,11 +19,10 @@ exports.handler = async (event) => {
   
   try {
     const body = JSON.parse(event.body);
-    // 이모지 보존 및 JSON 출력 강제를 위해 프롬프트 보강
     const userPrompt = body.prompt + "\n\nIMPORTANT: Return ONLY a raw JSON object. Do not use markdown blocks. Preserve all emojis and special symbols exactly.";
 
-    // [수정 포인트] v1을 v1beta로 변경했습니다. 대부분의 경우 이 주소가 가장 안정적입니다.
-    const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${API_KEY}`;
+    // [수정포인트] 모델명을 'gemini-1.5-flash-latest'로 더 구체화하고 v1 엔드포인트를 사용합니다.
+    const url = `https://generativelanguage.googleapis.com/v1/models/gemini-1.5-flash-latest:generateContent?key=${API_KEY}`;
 
     const response = await fetch(url, {
       method: 'POST',
@@ -37,18 +36,18 @@ exports.handler = async (event) => {
 
     const data = await response.json();
 
-    // API 응답 에러 핸들링
+    // API 에러 상세 출력 (디버깅용)
     if (data.error) {
+      console.error("Gemini API Error Detail:", data.error);
       return {
         statusCode: 500,
         headers: { 'Access-Control-Allow-Origin': '*' },
-        body: JSON.stringify({ error: data.error.message })
+        body: JSON.stringify({ error: `API 오류: ${data.error.message} (코드: ${data.error.code})` })
       };
     }
 
-    // 결과 텍스트 추출
     if (!data.candidates || data.candidates.length === 0) {
-      throw new Error("No candidates returned from Gemini API");
+      throw new Error("결과를 생성하지 못했습니다. 입력 문장을 확인해 주세요.");
     }
 
     const content = data.candidates[0].content.parts[0].text;
