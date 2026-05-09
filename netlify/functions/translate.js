@@ -19,10 +19,10 @@ exports.handler = async (event) => {
   
   try {
     const body = JSON.parse(event.body);
-    // 이모지 및 JSON 형식 유지를 위한 가이드라인 추가
     const userPrompt = body.prompt + "\n\nIMPORTANT: Output only the raw JSON object. No markdown tags. Preserve all special symbols and emojis.";
 
-    const url = `https://generativelanguage.googleapis.com/v1/models/gemini-1.5-flash:generateContent?key=${API_KEY}`;
+    // 가장 안정적인 v1beta 엔드포인트와 모델 경로 사용
+    const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${API_KEY}`;
 
     const response = await fetch(url, {
       method: 'POST',
@@ -30,17 +30,28 @@ exports.handler = async (event) => {
       body: JSON.stringify({
         contents: [{
           parts: [{ text: userPrompt }]
-        }]
+        }],
+        // v1beta에서는 아래 설정을 다시 활성화하여 JSON 형식을 강제할 수 있습니다.
+        generationConfig: {
+          response_mime_type: "application/json"
+        }
       })
     });
 
     const data = await response.json();
 
+    // API 내부 에러(모델 미지원 등)가 있는 경우 처리
     if (data.error) {
       return {
         statusCode: 500,
-        body: JSON.stringify({ error: data.error.message })
+        headers: { 'Access-Control-Allow-Origin': '*' },
+        body: JSON.stringify({ error: data.error.message || 'API Error' })
       };
+    }
+
+    // 응답 데이터 추출
+    if (!data.candidates || !data.candidates[0].content) {
+      throw new Error('API 응답 형식이 올바르지 않습니다.');
     }
 
     const content = data.candidates[0].content.parts[0].text;
