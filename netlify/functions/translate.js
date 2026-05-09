@@ -1,4 +1,5 @@
 exports.handler = async (event) => {
+  // CORS 처리
   if (event.httpMethod === 'OPTIONS') {
     return {
       statusCode: 200,
@@ -18,10 +19,10 @@ exports.handler = async (event) => {
   
   try {
     const body = JSON.parse(event.body);
-    // 모델이 확실히 JSON만 출력하도록 프롬프트 뒤에 강제 문구를 붙입니다.
-    const userPrompt = body.prompt + "\n\nIMPORTANT: Return ONLY a valid JSON object. Do not include markdown code blocks like ```json.";
+    // 이모지 및 JSON 형식 유지를 위한 가이드라인 추가
+    const userPrompt = body.prompt + "\n\nIMPORTANT: Output only the raw JSON object. No markdown tags. Preserve all special symbols and emojis.";
 
-    const url = `[https://generativelanguage.googleapis.com/v1/models/gemini-1.5-flash:generateContent?key=$](https://generativelanguage.googleapis.com/v1/models/gemini-1.5-flash:generateContent?key=$){API_KEY}`;
+    const url = `https://generativelanguage.googleapis.com/v1/models/gemini-1.5-flash:generateContent?key=${API_KEY}`;
 
     const response = await fetch(url, {
       method: 'POST',
@@ -30,7 +31,6 @@ exports.handler = async (event) => {
         contents: [{
           parts: [{ text: userPrompt }]
         }]
-        // 에러가 났던 generationConfig 부분을 제거하여 호환성을 확보합니다.
       })
     });
 
@@ -43,7 +43,6 @@ exports.handler = async (event) => {
       };
     }
 
-    // 응답 텍스트 추출
     const content = data.candidates[0].content.parts[0].text;
     
     return {
