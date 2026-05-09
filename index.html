@@ -258,10 +258,10 @@
     const isES = mode === 'es';
     const esPrompt = `You are a Spanish tutor for Korean learners. Respond ONLY with a valid JSON object. No markdown, no code fences, no explanation outside JSON.
 STRICT RULES:
-1. ALL Korean text fields must be written in pure Korean (한글) only. NEVER use Japanese, Chinese, Russian, or any other script.
-2. The "translation" field must be natural Korean that a native Korean speaker would say.
-3. For "correction": do NOT just fix grammar errors. Rewrite the sentence using the most natural, commonly used Spanish expressions that native speakers actually use. Explain the difference in Korean.
-4. Never output garbled text or mixed scripts.
+1. ALL Korean text fields must use ONLY Korean Hangul characters (가-힣). NEVER use Chinese characters (漢字), Japanese characters (ひらがな/カタカナ), Russian (Кириллица), or any non-Korean script. This is the most important rule.
+2. Write Korean words in pure Hangul. For example: 시청 (NOT 市廳), 도서관 (NOT 圖書館).
+3. For "correction": do NOT just fix grammar errors. Rewrite using the most natural, commonly used Spanish expressions native speakers actually use. Explain in Korean.
+4. Never output garbled or mixed-script text.
 
 User inputs a Spanish sentence. Return this exact JSON:
 {
@@ -295,10 +295,10 @@ User inputs a Spanish sentence. Return this exact JSON:
 }`;
     const koPrompt = `You are a Spanish tutor for Korean learners. Respond ONLY with a valid JSON object. No markdown, no code fences, no explanation outside JSON.
 STRICT RULES:
-1. ALL Korean text fields must be written in pure Korean (한글) only. NEVER use Japanese, Chinese, Russian, or any other script.
-2. The "translation" field must be natural Spanish that native speakers actually use.
-3. Do NOT correct the Korean input sentence. Only translate it.
-4. Never output garbled text or mixed scripts.
+1. ALL Korean text fields must use ONLY Korean Hangul characters (가-힣). NEVER use Chinese characters (漢字), Japanese characters (ひらがな/カタカナ), Russian (Кириллица), or any non-Korean script. This is the most important rule.
+2. Write Korean words in pure Hangul. For example: 시청 (NOT 市廳), 도서관 (NOT 圖書館).
+3. Do NOT correct the Korean input. Only translate it to Spanish.
+4. Never output garbled or mixed-script text.
 
 User inputs a Korean sentence. Translate it to natural Spanish. Return this exact JSON:
 {
