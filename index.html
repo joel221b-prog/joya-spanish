@@ -83,7 +83,7 @@
     <textarea id="input-text" placeholder="스페인어 문장을 입력하세요" rows="2"></textarea>
     <button class="go-btn" id="go-btn" onclick="doTranslate()">번역</button>
   </div>
-  <p class="hint" id="hint-text">스페인어를 입력하면 해석·교정·예제·동사 변환을 알려드려요 &nbsp;·&nbsp; Enter로 바로 번역</p>
+  <p class="hint" id="hint-text">스페인어를 입력하면 해석·교정·예제·동사 변환을 알려드려요  ·  Enter로 바로 번역</p>
   <hr class="divider">
   <div class="results" id="results">
     <div class="card card-translation">
@@ -166,34 +166,40 @@
     document.getElementById('res-grammar').innerHTML = '<span class="placeholder">로딩 중...</span>';
 
     const isES = mode === 'es';
-    const systemPrompt = `You are a Spanish language tutor assistant. Always respond ONLY in valid JSON, no markdown, no preamble.
-The user inputs a ${isES ? 'Spanish' : 'Korean'} sentence or word.
-Return this exact JSON structure:
+    // Gemini 최적화 프롬프트
+    const prompt = `You are a Spanish language tutor. 
+Input Language: ${isES ? 'Spanish' : 'Korean'}
+Input Text: "${text}"
+
+Task: Translate, correct, provide examples, and explain verb conjugations.
+Response Format: You MUST respond ONLY with a valid JSON object. No conversational text. 
+
+JSON Structure:
 {
-  "translation": "${isES ? 'Korean translation of the Spanish input' : 'Spanish translation of the Korean input'}",
-  "correction": "${isES ? 'If there are grammar errors, provide the corrected Spanish sentence and briefly explain in Korean. If correct, say 자연스러운 문장입니다.' : 'Natural Spanish version with brief Korean explanation of adjustments.'}",
+  "translation": "${isES ? 'Korean translation' : 'Spanish translation'}",
+  "correction": "Korean explanation of grammar/naturalness",
   "examples": [
-    {"es": "Spanish example sentence", "ko": "Korean translation"},
-    {"es": "Spanish example sentence 2", "ko": "Korean translation 2"},
-    {"es": "Spanish example sentence 3", "ko": "Korean translation 3"}
+    {"es": "Spanish sentence", "ko": "Korean translation"},
+    {"es": "Spanish sentence", "ko": "Korean translation"},
+    {"es": "Spanish sentence", "ko": "Korean translation"}
   ],
   "grammar": {
     "verbs": [
       {
-        "infinitive": "verb infinitive form",
+        "infinitive": "infinitive",
         "meaning": "Korean meaning",
-        "explanation": "Korean explanation of tense/mood/person used",
+        "explanation": "Korean explanation of conjugation used in the sentence",
         "conjugations": [
           {"pronoun": "yo", "form": "..."},
           {"pronoun": "tú", "form": "..."},
           {"pronoun": "él/ella", "form": "..."},
           {"pronoun": "nosotros", "form": "..."},
           {"pronoun": "vosotros", "form": "..."},
-          {"pronoun": "ellos", "form": "..."}
+          {"pronoun": "ellos/ellas", "form": "..."}
         ]
       }
     ],
-    "notes": "Additional Korean grammar notes about this sentence"
+    "notes": "Additional Korean grammar tips"
   }
 }`;
 
@@ -202,18 +208,17 @@ Return this exact JSON structure:
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          model: 'claude-sonnet-4-5',
-          max_tokens: 1200,
-          system: systemPrompt,
-          messages: [{ role: 'user', content: text }]
+          messages: [{ role: 'user', content: prompt }]
         })
       });
 
       const data = await resp.json();
-      if (data.error) throw new Error(JSON.stringify(data.error));
+      if (data.error) throw new Error(data.error);
 
-      const raw = data.content.map(b => b.text || '').join('');
-      const clean = raw.replace(/```json|```/g, '').trim();
+      // translate.js에서 이미 가공해서 보낸 content 사용
+      const raw = data.content || '';
+      const clean = raw.replace(/```json|
+```/g, '').trim();
       const parsed = JSON.parse(clean);
 
       setText('res-translation', parsed.translation || '-');
@@ -221,7 +226,8 @@ Return this exact JSON structure:
       renderExamples(parsed.examples || []);
       renderGrammar(parsed.grammar || {});
     } catch (e) {
-      setText('res-translation', '오류: ' + e.message);
+      console.error(e);
+      setText('res-translation', '오류가 발생했습니다. 다시 시도해주세요.');
       setText('res-correction', '-');
       document.getElementById('res-examples').innerHTML = '<span class="error">결과를 불러올 수 없습니다</span>';
       document.getElementById('res-grammar').innerHTML = '<span class="error">결과를 불러올 수 없습니다</span>';
