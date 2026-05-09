@@ -18,10 +18,10 @@ exports.handler = async (event) => {
   
   try {
     const body = JSON.parse(event.body);
-    const userPrompt = body.prompt;
+    // 모델이 확실히 JSON만 출력하도록 프롬프트 뒤에 강제 문구를 붙입니다.
+    const userPrompt = body.prompt + "\n\nIMPORTANT: Return ONLY a valid JSON object. Do not include markdown code blocks like ```json.";
 
-    // 이 줄이 핵심 수정 사항입니다! (v1beta -> v1 으로 변경)
-    const url = `https://generativelanguage.googleapis.com/v1/models/gemini-1.5-flash:generateContent?key=${API_KEY}`;
+    const url = `[https://generativelanguage.googleapis.com/v1/models/gemini-1.5-flash:generateContent?key=$](https://generativelanguage.googleapis.com/v1/models/gemini-1.5-flash:generateContent?key=$){API_KEY}`;
 
     const response = await fetch(url, {
       method: 'POST',
@@ -29,16 +29,13 @@ exports.handler = async (event) => {
       body: JSON.stringify({
         contents: [{
           parts: [{ text: userPrompt }]
-        }],
-        generationConfig: {
-          response_mime_type: "application/json"
-        }
+        }]
+        // 에러가 났던 generationConfig 부분을 제거하여 호환성을 확보합니다.
       })
     });
 
     const data = await response.json();
 
-    // API 응답 에러 처리
     if (data.error) {
       return {
         statusCode: 500,
@@ -46,6 +43,7 @@ exports.handler = async (event) => {
       };
     }
 
+    // 응답 텍스트 추출
     const content = data.candidates[0].content.parts[0].text;
     
     return {
