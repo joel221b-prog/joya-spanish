@@ -1,5 +1,5 @@
 exports.handler = async (event) => {
-  // CORS 처리
+  // 1. CORS 및 옵션 요청 처리
   if (event.httpMethod === 'OPTIONS') {
     return {
       statusCode: 200,
@@ -19,9 +19,10 @@ exports.handler = async (event) => {
   
   try {
     const body = JSON.parse(event.body);
-    const userPrompt = body.prompt + "\n\nIMPORTANT: Output only the raw JSON object. No markdown tags. Preserve all special symbols and emojis.";
+    // 이모지 보존 및 JSON 출력 강제를 위해 프롬프트 보강
+    const userPrompt = body.prompt + "\n\nIMPORTANT: Return ONLY a raw JSON object. Do not use markdown blocks. Preserve all emojis and special symbols exactly.";
 
-    // 가장 안정적인 v1beta 엔드포인트와 모델 경로 사용
+    // [수정 포인트] 모델 경로에 'models/'를 명시하고 v1beta 엔드포인트를 사용합니다.
     const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${API_KEY}`;
 
     const response = await fetch(url, {
@@ -30,28 +31,25 @@ exports.handler = async (event) => {
       body: JSON.stringify({
         contents: [{
           parts: [{ text: userPrompt }]
-        }],
-        // v1beta에서는 아래 설정을 다시 활성화하여 JSON 형식을 강제할 수 있습니다.
-        generationConfig: {
-          response_mime_type: "application/json"
-        }
+        }]
+        // 불필요한 generationConfig를 제거하여 호환성 에러를 방지합니다.
       })
     });
 
     const data = await response.json();
 
-    // API 내부 에러(모델 미지원 등)가 있는 경우 처리
+    // API 응답 에러 핸들링
     if (data.error) {
       return {
         statusCode: 500,
         headers: { 'Access-Control-Allow-Origin': '*' },
-        body: JSON.stringify({ error: data.error.message || 'API Error' })
+        body: JSON.stringify({ error: data.error.message })
       };
     }
 
-    // 응답 데이터 추출
-    if (!data.candidates || !data.candidates[0].content) {
-      throw new Error('API 응답 형식이 올바르지 않습니다.');
+    // 결과 텍스트 추출
+    if (!data.candidates || data.candidates.length === 0) {
+      throw new Error("No candidates returned from Gemini API");
     }
 
     const content = data.candidates[0].content.parts[0].text;
