@@ -42,6 +42,9 @@
     .seg-btn { flex: 1; display: flex; align-items: center; justify-content: center; gap: 6px; padding: 10px 16px; border-radius: 24px; border: none; background: transparent; cursor: pointer; font-size: 14px; font-weight: 500; color: var(--md-on-surface-variant); font-family: 'Noto Sans KR', sans-serif; transition: all 0.2s; }
     .seg-btn.active { background: var(--md-primary); color: white; box-shadow: var(--shadow-sm); }
     .seg-btn .flag { font-size: 20px; }
+    .lang-code { font-size: 10px; font-weight: 800; letter-spacing: 0.08em; padding: 2px 6px; border-radius: 6px; background: rgba(255,255,255,0.25); }
+    .seg-btn.active .lang-code { background: rgba(255,255,255,0.25); color: white; }
+    .seg-btn:not(.active) .lang-code { background: rgba(103,80,164,0.12); color: var(--md-primary); }
     .seg-arrow { font-size: 16px; color: var(--md-on-surface-variant); display: flex; align-items: center; padding: 0 2px; }
 
     .input-card { background: white; border-radius: 16px; border: 1.5px solid var(--md-outline-variant); padding: 16px; transition: border-color 0.2s, box-shadow 0.2s; }
@@ -117,9 +120,9 @@
 
 <main class="main">
   <div class="segment-wrap">
-    <button class="seg-btn active" id="btn-es" onclick="setMode('es')"><img src="https://flagcdn.com/24x18/es.png" alt="ES" style="border-radius:2px"> 스페인어</button>
+    <button class="seg-btn active" id="btn-es" onclick="setMode('es')"><span class="lang-code">ES</span> 스페인어</button>
     <span class="seg-arrow">⇄</span>
-    <button class="seg-btn" id="btn-ko" onclick="setMode('ko')"><img src="https://flagcdn.com/24x18/kr.png" alt="KR" style="border-radius:2px"> 한국어</button>
+    <button class="seg-btn" id="btn-ko" onclick="setMode('ko')"><span class="lang-code">KR</span> 한국어</button>
   </div>
 
   <div class="input-card">
