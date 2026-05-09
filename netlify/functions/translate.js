@@ -1,36 +1,68 @@
+const fetch = require('node-fetch');
+
 exports.handler = async (event) => {
+  // CORS 처리
+  if (event.httpMethod === 'OPTIONS') {
+    return {
+      statusCode: 200,
+      headers: {
+        'Access-Control-Allow-Origin': '*',
+        'Access-Control-Allow-Headers': 'Content-Type',
+        'Access-Control-Allow-Methods': 'POST, OPTIONS'
+      }
+    };
+  }
+
   if (event.httpMethod !== 'POST') {
     return { statusCode: 405, body: 'Method Not Allowed' };
   }
 
-  const API_KEY = process.env.GEMINI_API_KEY; // 위에서 설정한 환경변수 이름
+  const API_KEY = process.env.GEMINI_API_KEY; 
   
   try {
     const body = JSON.parse(event.body);
-    // Gemini API 엔드포인트 (모델명: gemini-1.5-flash 추천)
+    const userPrompt = body.prompt; // index.html에서 보낼 데이터
+
+    // Gemini 1.5 Flash API 엔드포인트
     const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${API_KEY}`;
 
     const response = await fetch(url, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
-        contents: [{ parts: [{ text: body.messages[0].content }] }]
+        contents: [{
+          parts: [{ text: userPrompt }]
+        }],
+        generationConfig: {
+          response_mime_type: "application/json" // 응답을 JSON으로 강제
+        }
       })
     });
 
     const data = await response.json();
-    
-    // 제미나이 응답 형식을 기존 HTML이 이해할 수 있게 가공
+
+    if (data.error) {
+      return {
+        statusCode: 500,
+        body: JSON.stringify({ error: data.error.message })
+      };
+    }
+
+    // 제미나이의 응답 텍스트 추출
     const content = data.candidates[0].content.parts[0].text;
     
     return {
       statusCode: 200,
-      headers: { 'Content-Type': 'application/json' },
+      headers: {
+        'Content-Type': 'application/json',
+        'Access-Control-Allow-Origin': '*'
+      },
       body: JSON.stringify({ content: content })
     };
   } catch (err) {
     return {
       statusCode: 500,
+      headers: { 'Access-Control-Allow-Origin': '*' },
       body: JSON.stringify({ error: err.message })
     };
   }
