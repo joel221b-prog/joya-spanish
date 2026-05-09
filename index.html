@@ -166,40 +166,29 @@
     document.getElementById('res-grammar').innerHTML = '<span class="placeholder">로딩 중...</span>';
 
     const isES = mode === 'es';
-    // Gemini 최적화 프롬프트
-    const prompt = `You are a Spanish language tutor. 
-Input Language: ${isES ? 'Spanish' : 'Korean'}
-Input Text: "${text}"
-
-Task: Translate, correct, provide examples, and explain verb conjugations.
-Response Format: You MUST respond ONLY with a valid JSON object. No conversational text. 
-
-JSON Structure:
+    
+    // Gemini 프롬프트 구성
+    const prompt = `You are a professional Spanish tutor. Analyze the ${isES ? 'Spanish' : 'Korean'} input: "${text}"
+Respond ONLY with a valid JSON object. 
 {
-  "translation": "${isES ? 'Korean translation' : 'Spanish translation'}",
+  "translation": "Korean translation",
   "correction": "Korean explanation of grammar/naturalness",
-  "examples": [
-    {"es": "Spanish sentence", "ko": "Korean translation"},
-    {"es": "Spanish sentence", "ko": "Korean translation"},
-    {"es": "Spanish sentence", "ko": "Korean translation"}
-  ],
+  "examples": [{"es": "...", "ko": "..."}],
   "grammar": {
-    "verbs": [
-      {
-        "infinitive": "infinitive",
-        "meaning": "Korean meaning",
-        "explanation": "Korean explanation of conjugation used in the sentence",
-        "conjugations": [
-          {"pronoun": "yo", "form": "..."},
-          {"pronoun": "tú", "form": "..."},
-          {"pronoun": "él/ella", "form": "..."},
-          {"pronoun": "nosotros", "form": "..."},
-          {"pronoun": "vosotros", "form": "..."},
-          {"pronoun": "ellos/ellas", "form": "..."}
-        ]
-      }
-    ],
-    "notes": "Additional Korean grammar tips"
+    "verbs": [{
+      "infinitive": "...",
+      "meaning": "...",
+      "explanation": "Korean explanation",
+      "conjugations": [
+        {"pronoun": "yo", "form": "..."},
+        {"pronoun": "tú", "form": "..."},
+        {"pronoun": "él/ella", "form": "..."},
+        {"pronoun": "nosotros", "form": "..."},
+        {"pronoun": "vosotros", "form": "..."},
+        {"pronoun": "ellos/ellas", "form": "..."}
+      ]
+    }],
+    "notes": "Additional tips in Korean"
   }
 }`;
 
@@ -207,19 +196,18 @@ JSON Structure:
       const resp = await fetch('/.netlify/functions/translate', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          messages: [{ role: 'user', content: prompt }]
-        })
+        body: JSON.stringify({ prompt: prompt })
       });
 
-      const data = await resp.json();
-      if (data.error) throw new Error(data.error);
+      if (!resp.ok) {
+        const errData = await resp.json();
+        throw new Error(errData.error || 'Server Error');
+      }
 
-      // translate.js에서 이미 가공해서 보낸 content 사용
-      const raw = data.content || '';
-      const clean = raw.replace(/```json|
-```/g, '').trim();
-      const parsed = JSON.parse(clean);
+      const data = await resp.json();
+      
+      // 제미나이 응답 파싱
+      const parsed = JSON.parse(data.content);
 
       setText('res-translation', parsed.translation || '-');
       setText('res-correction', parsed.correction || '-');
@@ -227,10 +215,8 @@ JSON Structure:
       renderGrammar(parsed.grammar || {});
     } catch (e) {
       console.error(e);
-      setText('res-translation', '오류가 발생했습니다. 다시 시도해주세요.');
+      setText('res-translation', '오류가 발생했습니다: ' + e.message);
       setText('res-correction', '-');
-      document.getElementById('res-examples').innerHTML = '<span class="error">결과를 불러올 수 없습니다</span>';
-      document.getElementById('res-grammar').innerHTML = '<span class="error">결과를 불러올 수 없습니다</span>';
     } finally {
       setLoading(false);
     }
