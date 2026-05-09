@@ -1,8 +1,4 @@
-// 1. 기존 맨 윗줄의 const fetch = require('node-fetch'); 를 반드시 삭제하세요!
-// 최신 Node.js 환경에서는 아래와 같이 바로 fetch를 사용할 수 있습니다.
-
 exports.handler = async (event) => {
-  // CORS 처리 (브라우저 허용)
   if (event.httpMethod === 'OPTIONS') {
     return {
       statusCode: 200,
@@ -24,10 +20,9 @@ exports.handler = async (event) => {
     const body = JSON.parse(event.body);
     const userPrompt = body.prompt;
 
-    // Gemini 1.5 Flash API 주소
-    const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${API_KEY}`;
+    // 이 줄이 핵심 수정 사항입니다! (v1beta -> v1 으로 변경)
+    const url = `https://generativelanguage.googleapis.com/v1/models/gemini-1.5-flash:generateContent?key=${API_KEY}`;
 
-    // 별도의 require('node-fetch') 없이 내장 fetch 사용
     const response = await fetch(url, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
@@ -43,6 +38,7 @@ exports.handler = async (event) => {
 
     const data = await response.json();
 
+    // API 응답 에러 처리
     if (data.error) {
       return {
         statusCode: 500,
