@@ -419,6 +419,7 @@ async function doTranslate(mode) {
   btn.disabled = true;
   btn.innerHTML = '<div class="spin"></div>';
   document.getElementById('results-' + mode).classList.add('show');
+  var _resetBtn = function() { btn.disabled = false; btn.innerHTML = '번역'; };
 
   setText('r-trans-' + mode, '번역 중...');
   if (isES) setHTML('r-corr-es', '<span class="ph">분석 중...</span>');
@@ -437,23 +438,27 @@ async function doTranslate(mode) {
 
     // 2단계: 교정/문법분석/동사변환/예제 병렬
     setHTML('r-verb-es', '<span class="ph">로딩 중...</span>');
-    await Promise.all([
-      fetchCorrection(raw).then(function(c) {
-        renderCorr(c);
-      }).catch(function() { setHTML('r-corr-es', '<span class="err-txt">오류 발생</span>'); }),
+    try {
+      await Promise.all([
+        fetchCorrection(raw).then(function(c) {
+          renderCorr(c);
+        }).catch(function() { setHTML('r-corr-es', '<span class="err-txt">오류 발생</span>'); }),
 
-      fetchGrammar(raw).then(function(d) {
-        renderGram(d, 'es');
-      }).catch(function() { setHTML('r-gram-es', '<span class="ph">분석할 수 없습니다.</span>'); }),
+        fetchGrammar(raw).then(function(d) {
+          renderGram(d, 'es');
+        }).catch(function() { setHTML('r-gram-es', '<span class="ph">분석할 수 없습니다.</span>'); }),
 
-      fetchVerbs(raw).then(function(arr) {
-        renderVerbs(arr, 'es');
-      }).catch(function() { setHTML('r-verb-es', '<span class="err-txt">오류 발생</span>'); }),
+        fetchVerbs(raw).then(function(arr) {
+          renderVerbs(arr, 'es');
+        }).catch(function() { setHTML('r-verb-es', '<span class="err-txt">오류 발생</span>'); }),
 
-      fetchExamples(true, raw).then(function(arr) {
-        renderEx(arr, 'es');
-      }).catch(function() { setHTML('r-ex-es', '<span class="err-txt">오류 발생</span>'); })
-    ]);
+        fetchExamples(true, raw).then(function(arr) {
+          renderEx(arr, 'es');
+        }).catch(function() { setHTML('r-ex-es', '<span class="err-txt">오류 발생</span>'); })
+      ]);
+    } catch(e) {
+      console.error('parallel error:', e);
+    }
 
   } else {
     // 1단계: 번역 먼저 빠르게 표시
@@ -469,23 +474,26 @@ async function doTranslate(mode) {
     // 2단계: 문법분석/동사변환/예제 병렬
     var esTarget = esTranslation || raw;
     setHTML('r-verb-ko', '<span class="ph">로딩 중...</span>');
-    await Promise.all([
-      fetchGrammar(esTarget).then(function(d) {
-        renderGram(d, 'ko');
-      }).catch(function() { setHTML('r-gram-ko', '<span class="ph">분석할 수 없습니다.</span>'); }),
+    try {
+      await Promise.all([
+        fetchGrammar(esTarget).then(function(d) {
+          renderGram(d, 'ko');
+        }).catch(function() { setHTML('r-gram-ko', '<span class="ph">분석할 수 없습니다.</span>'); }),
 
-      fetchVerbs(esTarget).then(function(arr) {
-        renderVerbs(arr, 'ko');
-      }).catch(function() { setHTML('r-verb-ko', '<span class="err-txt">오류 발생</span>'); }),
+        fetchVerbs(esTarget).then(function(arr) {
+          renderVerbs(arr, 'ko');
+        }).catch(function() { setHTML('r-verb-ko', '<span class="err-txt">오류 발생</span>'); }),
 
-      fetchExamples(false, raw).then(function(arr) {
-        renderEx(arr, 'ko');
-      }).catch(function() { setHTML('r-ex-ko', '<span class="err-txt">오류 발생</span>'); })
-    ]);
+        fetchExamples(false, raw).then(function(arr) {
+          renderEx(arr, 'ko');
+        }).catch(function() { setHTML('r-ex-ko', '<span class="err-txt">오류 발생</span>'); })
+      ]);
+    } catch(e) {
+      console.error('parallel error:', e);
+    }
   }
 
-  btn.disabled = false;
-  btn.innerHTML = '번역';
+  _resetBtn();
 }
 
 // 동사 변환표 — 기본정보 + 시제 2회 병렬
