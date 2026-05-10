@@ -328,13 +328,21 @@ function getESPrompt(text) {
 function getKOPrompt(text) {
   return RULE +
     'Spanish tutor for Korean learners. JSON only, no markdown.\n' +
-    'Translate this Korean to Spanish and analyze:\n' +
-    '{"translation":"Spanish translation(preserve line breaks)",' +
-    '"native_text":"더자연스러운원어민ES표현",' +
-    '"native_tip":"한국어로차이점20자이내",' +
-    '"grammar":[{"tag":"문법표현","desc":"구체적설명"},{"tag":"시제","desc":"설명"},{"tag":"표현법","desc":"설명"}],' +
-    '"key_verb":{"infinitive":"ES원형","meaning":"한국어뜻","conjugations":[{"pronoun":"yo","form":""},{"pronoun":"tú","form":""},{"pronoun":"él/ella","form":""},{"pronoun":"nosotros","form":""},{"pronoun":"vosotros","form":""},{"pronoun":"ellos","form":""}]}}\n' +
-    'Korean: ' + text;
+    'Step 1: Translate Korean input to Spanish.\n' +
+    'Step 2: Suggest a more natural SPANISH expression a native speaker would use.\n' +
+    'Step 3: Analyze the SPANISH grammar (not Korean).\n' +
+    'ALL description fields must be in Korean Hangul. translation and native_text must be in Spanish.\n' +
+    'Return:\n' +
+    '{"translation":"[SPANISH translation here]",' +
+    '"native_text":"[More natural SPANISH expression here - must be Spanish, not Korean]",' +
+    '"native_tip":"[한국어로 차이점 설명 20자이내]",' +
+    '"grammar":[' +
+    '{"tag":"문법표현","desc":"[스페인어 문법 설명 한국어로]"},' +
+    '{"tag":"시제","desc":"[스페인어 시제 설명 한국어로]"},' +
+    '{"tag":"표현법","desc":"[스페인어 표현 설명 한국어로]"}],' +
+    '"key_verb":{"infinitive":"[Spanish infinitive]","meaning":"[한국어뜻]",' +
+    '"conjugations":[{"pronoun":"yo","form":""},{"pronoun":"tú","form":""},{"pronoun":"él/ella","form":""},{"pronoun":"nosotros","form":""},{"pronoun":"vosotros","form":""},{"pronoun":"ellos","form":""}]}}\n' +
+    'Korean input: ' + text;
 }
 
 function renderCorr(c) {
@@ -486,6 +494,10 @@ async function doConjugate() {
       }
     }
     h += '</div>';
+    // 모두 펼치기 버튼
+    h += '<div style="padding:12px 16px;border-top:1px solid var(--b2);text-align:center">';
+    h += '<button id="expand-all-btn" onclick="toggleAllTenses()" style="font-size:12px;color:var(--teal);background:var(--tbg);border:1px solid rgba(26,107,90,0.15);padding:7px 20px;border-radius:100px;cursor:pointer;font-family:'Noto Sans KR',sans-serif;font-weight:500">모두 펼치기 ↓</button>';
+    h += '</div>';
     document.getElementById('conj-result').innerHTML = h;
   } catch(e) {
     document.getElementById('conj-result').innerHTML = '<p style="color:var(--red);font-size:13px;padding:16px 0">오류: ' + e.message + '</p>';
@@ -516,6 +528,24 @@ function toggleTense(bodyId, arrowId) {
   var arrow = document.getElementById(arrowId);
   if (body) body.classList.toggle('open');
   if (arrow) arrow.classList.toggle('open');
+  updateExpandBtn();
+}
+
+function updateExpandBtn() {
+  var btn = document.getElementById('expand-all-btn');
+  if (!btn) return;
+  var bodies = document.querySelectorAll('.tense-body');
+  var allOpen = Array.prototype.every.call(bodies, function(b) { return b.classList.contains('open'); });
+  btn.textContent = allOpen ? '모두 접기 ↑' : '모두 펼치기 ↓';
+}
+
+function toggleAllTenses() {
+  var bodies = document.querySelectorAll('.tense-body');
+  var arrows = document.querySelectorAll('.tense-arrow');
+  var allOpen = Array.prototype.every.call(bodies, function(b) { return b.classList.contains('open'); });
+  bodies.forEach(function(b) { b.classList.toggle('open', !allOpen); });
+  arrows.forEach(function(a) { a.classList.toggle('open', !allOpen); });
+  updateExpandBtn();
 }
 </script>
 </body>
