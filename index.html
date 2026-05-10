@@ -337,61 +337,128 @@ function renderGram(d, suffix) {
   el.innerHTML = h || '<span class="ph">문법 정보 없음</span>';
 }
 
-function getPrompt(isES, text) {
-  var rule = 'Korean Hangul only in all Korean fields. No Chinese/Japanese chars.\n';
-  var conj = '[{"pronoun":"yo","form":"?"},{"pronoun":"tú","form":"?"},{"pronoun":"él/ella","form":"?"},{"pronoun":"nosotros","form":"?"},{"pronoun":"vosotros","form":"?"},{"pronoun":"ellos","form":"?"}]';
-  var verbSchema = '{"infinitive":"?","meaning":"한국어뜻","explanation":"한국어설명","conjugations":' + conj + '}';
-  var gramSchema = '{"analysis":[{"tag":"주어","desc":"?"},{"tag":"동사","desc":"?"},{"tag":"시제","desc":"?"}],"verbs":[' + verbSchema + '],"notes":"한국어"}';
-  var exSchema = '[{"es":"?","ko":"?"},{"es":"?","ko":"?"},{"es":"?","ko":"?"}]';
-  if (isES) {
-    var schema = '{"translation":"한국어번역","correction":{"original":"원문","errors":[{"error":"?","fix":"?","desc":"?"}],"result":"교정문"},"examples":' + exSchema + ',"grammar":' + gramSchema + '}';
-    return rule + 'Spanish tutor. JSON only. Input=Spanish. examples=3 similar Spanish sentences. grammar.analysis=breakdown in Korean. If no errors set errors:[].\nJSON: ' + schema + '\nInput: ' + text;
-  } else {
-    var schema = '{"translation":"ES번역","correction":{"original":"원문","errors":[],"result":"원문"},"examples":' + exSchema + ',"grammar":' + gramSchema + '}';
-    return rule + 'Spanish tutor. JSON only. Input=Korean→translate to Spanish. errors=[]. examples=3 similar Spanish sentences. grammar=analyze Spanish translation in Korean.\nJSON: ' + schema + '\nInput: ' + text;
-  }
+async function callAPI(prompt, input) {
+  var resp = await fetch('/.netlify/functions/translate', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ system: prompt, messages: [{ role: 'user', content: input }] })
+  });
+  var data = await resp.json();
+  if (data.error) throw new Error(data.error);
+  var txt = data.content.map(function(b) { return b.text || ''; }).join('');
+  var s = txt.indexOf('{'), e = txt.lastIndexOf('}');
+  if (s !== -1 && e !== -1) txt = txt.substring(s, e + 1);
+  txt = txt.replace(/[ --]/g, '');
+  return JSON.parse(txt);
+}
+
+var RULE = 'Korean Hangul only in Korean fields. No Chinese/Japanese characters.\n';
+
+async function fetchTranslation(isES, text) {
+  var prompt = RULE + 'Spanish tutor. JSON only, no markdown.\n' +
+    (isES ? 'Input=Spanish. Return {"translation":"한국어번역"}' : 'Input=Korean. Return {"translation":"스페인어번역"}') +
+    '\nInput: ' + text;
+  var r = await callAPI(prompt, text);
+  return r.translation || '-';
+}
+
+async function fetchCorrection(text) {
+  var prompt = RULE + 'Spanish tutor. JSON only, no markdown.\n' +
+    'Input=Spanish sentence. Check grammar. Return:\n' +
+    '{"original":"원문","errors":[{"error":"오류설명","fix":"수정","desc":"이유"}],"result":"교정문"}\n' +
+    'If correct, set errors:[]. Be concise.\nInput: ' + text;
+  return await callAPI(prompt, text);
+}
+
+async function fetchExamples(isES, text) {
+  var prompt = RULE + 'Spanish tutor. JSON only, no markdown.\n' +
+    'Input=' + (isES ? 'Spanish' : 'Korean') + ' sentence.\n' +
+    'Return 3 Spanish example sentences on similar topic (NOT the same sentence):\n' +
+    '{"examples":[{"es":"스페인어예문","ko":"한국어번역"},{"es":"예문2","ko":"번역2"},{"es":"예문3","ko":"번역3"}]}\n' +
+    'Input: ' + text;
+  var r = await callAPI(prompt, text);
+  return r.examples || [];
+}
+
+async function fetchGrammar(isES, text) {
+  var targetText = text;
+  var prompt = RULE + 'Spanish tutor. JSON only, no markdown.\n' +
+    'Analyze the grammar of this ' + (isES ? 'Spanish' : 'Spanish translation of Korean') + ' sentence. Be concise (max 20 chars per desc).\n' +
+    '{"analysis":[{"tag":"주어","desc":"설명"},{"tag":"동사","desc":"설명"},{"tag":"시제","desc":"설명"}],' +
+    '"notes":"핵심문법노트(30자이내)"}\nInput: ' + targetText;
+  return await callAPI(prompt, text);
+}
+
+async function fetchVerbs(isES, text) {
+  var conj = '[{"pronoun":"yo","form":""},{"pronoun":"tú","form":""},{"pronoun":"él/ella","form":""},{"pronoun":"nosotros","form":""},{"pronoun":"vosotros","form":""},{"pronoun":"ellos","form":""}]';
+  var prompt = RULE + 'Spanish tutor. JSON only, no markdown.\n' +
+    'Find main verbs in this ' + (isES ? 'Spanish' : 'Korean (find equivalent Spanish verbs)') + ' sentence.\n' +
+    'Return:\n{"verbs":[{"infinitive":"동사원형","meaning":"한국어뜻","explanation":"시제설명(20자이내)",' +
+    '"conjugations":' + conj + '}]}\nInput: ' + text;
+  var r = await callAPI(prompt, text);
+  return r.verbs || [];
 }
 
 async function doTranslate(mode) {
   var ta = document.getElementById('ta-' + mode);
   var raw = ta.value.trim();
   if (!raw) return;
-  setLoading(mode, true);
-  document.getElementById('results-' + mode).classList.add('show');
-  setText('r-trans-' + mode, '분석 중...');
-  if (mode === 'es') {
-    document.getElementById('r-corr-es').innerHTML = '<span class="ph">분석 중...</span>';
-  }
+
+  var isES = mode === 'es';
+  var btn = document.getElementById('btn-' + mode);
+  btn.disabled = true;
+  btn.innerHTML = '<div class="spin"></div>';
+
+  var results = document.getElementById('results-' + mode);
+  results.classList.add('show');
+
+  // Reset all cards to loading
+  setText('r-trans-' + mode, '번역 중...');
+  if (isES) document.getElementById('r-corr-es').innerHTML = '<span class="ph">분석 중...</span>';
   document.getElementById('r-ex-' + mode).innerHTML = '<span class="ph">로딩 중...</span>';
   document.getElementById('r-gram-' + mode).innerHTML = '<span class="ph">로딩 중...</span>';
 
+  // 1. Translation
   try {
-    var resp = await fetch('/.netlify/functions/translate', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ system: getPrompt(mode === 'es', raw), messages: [{ role: 'user', content: raw }] })
-    });
-    var data = await resp.json();
-    if (data.error) throw new Error(data.error);
+    var translation = await fetchTranslation(isES, raw);
+    setText('r-trans-' + mode, translation);
+  } catch(e) { setText('r-trans-' + mode, '오류: ' + e.message); }
 
-    var txt = data.content.map(function(b) { return b.text || ''; }).join('');
-    var s = txt.indexOf('{'), e = txt.lastIndexOf('}');
-    if (s !== -1 && e !== -1) txt = txt.substring(s, e + 1);
-    txt = txt.replace(/[\x00-\x08\x0B\x0C\x0E-\x1F\x7F]/g, '');
-    var p = JSON.parse(txt);
-
-    setText('r-trans-' + mode, p.translation || '-');
-    if (mode === 'es') renderCorr(p.correction, 'es');
-    renderEx(p.examples || [], mode);
-    renderGram(p.grammar || {}, mode);
-  } catch(err) {
-    setText('r-trans-' + mode, '오류: ' + err.message);
-    if (mode === 'es') document.getElementById('r-corr-es').innerHTML = '<span class="err">오류 발생</span>';
-    document.getElementById('r-ex-' + mode).innerHTML = '<span class="err">결과를 불러올 수 없습니다</span>';
-    document.getElementById('r-gram-' + mode).innerHTML = '<span class="err">결과를 불러올 수 없습니다</span>';
-  } finally {
-    setLoading(mode, false);
+  // 2. Correction (ES only)
+  if (isES) {
+    try {
+      var corr = await fetchCorrection(raw);
+      renderCorr(corr, 'es');
+    } catch(e) { document.getElementById('r-corr-es').innerHTML = '<span class="err">오류 발생</span>'; }
   }
+
+  // 3. Examples
+  try {
+    var exs = await fetchExamples(isES, raw);
+    renderEx(exs, mode);
+  } catch(e) { document.getElementById('r-ex-' + mode).innerHTML = '<span class="err">오류 발생</span>'; }
+
+  // 4. Grammar analysis
+  var gramData = {};
+  try {
+    var gram = await fetchGrammar(isES, raw);
+    gramData.analysis = gram.analysis || [];
+    gramData.notes = gram.notes || '';
+    document.getElementById('r-gram-' + mode).innerHTML = '<span class="ph">동사 변환 로딩 중...</span>';
+  } catch(e) { gramData.analysis = []; }
+
+  // 5. Verb conjugation
+  try {
+    var verbData = await fetchVerbs(isES, raw);
+    gramData.verbs = verbData;
+    renderGram(gramData, mode);
+  } catch(e) {
+    gramData.verbs = [];
+    renderGram(gramData, mode);
+  }
+
+  btn.disabled = false;
+  btn.innerHTML = '번역';
 }
 
 async function doConjugate() {
