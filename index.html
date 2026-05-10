@@ -407,14 +407,16 @@ async function doTranslate(mode) {
   setHTML('r-ex-' + mode, '<span class="ph">로딩 중...</span>');
 
   if (isES) {
-    // 스페인어: 번역/교정/문법+동사/예제 4개 동시 병렬
-    await Promise.all([
-      fetchTranslation(true, raw).then(function(t) {
-        var el = document.getElementById('r-trans-es');
-        el.style.whiteSpace = 'pre-wrap';
-        el.textContent = t;
-      }).catch(function(e) { setText('r-trans-es', '오류: ' + e.message); }),
+    // 1단계: 번역 먼저 빠르게 표시
+    try {
+      var t = await fetchTranslation(true, raw);
+      var el = document.getElementById('r-trans-es');
+      el.style.whiteSpace = 'pre-wrap';
+      el.textContent = t;
+    } catch(e) { setText('r-trans-es', '오류: ' + e.message); }
 
+    // 2단계: 교정/문법/예제 병렬
+    await Promise.all([
       fetchCorrection(raw).then(function(c) {
         renderCorr(c);
       }).catch(function() { setHTML('r-corr-es', '<span class="err-txt">오류 발생</span>'); }),
@@ -429,7 +431,7 @@ async function doTranslate(mode) {
     ]);
 
   } else {
-    // 한국어: 번역 먼저 완료 → 스페인어 결과로 문법 분석 + 예제 병렬
+    // 1단계: 번역 먼저 빠르게 표시
     var esTranslation = '';
     try {
       esTranslation = await fetchTranslation(false, raw);
@@ -437,11 +439,9 @@ async function doTranslate(mode) {
       el.style.whiteSpace = 'pre-wrap';
       el.style.wordBreak = 'break-word';
       el.textContent = esTranslation;
-    } catch(e) {
-      setText('r-trans-ko', '오류: ' + e.message);
-    }
+    } catch(e) { setText('r-trans-ko', '오류: ' + e.message); }
 
-    // 번역된 스페인어로 문법 분석 + 예제 병렬
+    // 2단계: 문법/예제 병렬
     await Promise.all([
       fetchGrammarAndVerbs(false, esTranslation || raw, esTranslation).then(function(d) {
         renderGram(d, 'ko');
