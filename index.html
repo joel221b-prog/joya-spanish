@@ -166,8 +166,8 @@
   <div class="results" id="results-es">
     <div class="card c-trans"><div class="card-hd"><span class="card-hd-dot"></span>해석</div><div class="card-bd" id="r-trans-es"><span class="ph">번역 결과가 여기 표시됩니다</span></div></div>
     <div class="card c-corr"><div class="card-hd"><span class="card-hd-dot"></span>문장 교정</div><div class="card-bd" id="r-corr-es"><span class="ph">교정 내용이 여기 표시됩니다</span></div></div>
-    <div class="card c-ex"><div class="card-hd"><span class="card-hd-dot"></span>비슷한 예제</div><div class="card-bd" id="r-ex-es"><span class="ph">관련 예제 문장이 여기 표시됩니다</span></div></div>
     <div class="card c-gram"><div class="card-hd"><span class="card-hd-dot"></span>문법 분석 &amp; 동사 변환</div><div class="card-bd" id="r-gram-es"><span class="ph">문법 설명이 여기 표시됩니다</span></div></div>
+    <div class="card c-ex"><div class="card-hd"><span class="card-hd-dot"></span>비슷한 예제</div><div class="card-bd" id="r-ex-es"><span class="ph">관련 예제 문장이 여기 표시됩니다</span></div></div>
   </div>
 </div>
 
@@ -181,8 +181,8 @@
   </div>
   <div class="results" id="results-ko">
     <div class="card c-trans"><div class="card-hd"><span class="card-hd-dot"></span>스페인어 번역</div><div class="card-bd" id="r-trans-ko"><span class="ph">번역 결과가 여기 표시됩니다</span></div></div>
-    <div class="card c-ex"><div class="card-hd"><span class="card-hd-dot"></span>비슷한 예제</div><div class="card-bd" id="r-ex-ko"><span class="ph">관련 예제 문장이 여기 표시됩니다</span></div></div>
     <div class="card c-gram"><div class="card-hd"><span class="card-hd-dot"></span>문법 분석 &amp; 동사 변환</div><div class="card-bd" id="r-gram-ko"><span class="ph">문법 설명이 여기 표시됩니다</span></div></div>
+    <div class="card c-ex"><div class="card-hd"><span class="card-hd-dot"></span>비슷한 예제</div><div class="card-bd" id="r-ex-ko"><span class="ph">관련 예제 문장이 여기 표시됩니다</span></div></div>
   </div>
 </div>
 
@@ -359,33 +359,42 @@ async function doTranslate(mode) {
 
   setText('r-trans-' + mode, '번역 중...');
   if (isES) setHTML('r-corr-es', '<span class="ph">분석 중...</span>');
-  setHTML('r-ex-' + mode, '<span class="ph">로딩 중...</span>');
   setHTML('r-gram-' + mode, '<span class="ph">로딩 중...</span>');
+  setHTML('r-ex-' + mode, '<span class="ph">로딩 중...</span>');
 
-  try { setText('r-trans-' + mode, await fetchTranslation(isES, raw)); }
-  catch(e) { setText('r-trans-' + mode, '오류: ' + e.message); }
+  // 번역+교정+문법+동사 동시 호출, 예제는 마지막에
+  var tasks = [
+    fetchTranslation(isES, raw).then(function(t) {
+      setText('r-trans-' + mode, t);
+    }).catch(function(e) {
+      setText('r-trans-' + mode, '오류: ' + e.message);
+    }),
 
-  if (isES) {
-    try { renderCorr(await fetchCorrection(raw)); }
-    catch(e) { setHTML('r-corr-es', '<span class="err-txt">오류 발생</span>'); }
-  }
+    isES ? fetchCorrection(raw).then(function(c) {
+      renderCorr(c);
+    }).catch(function() {
+      setHTML('r-corr-es', '<span class="err-txt">오류 발생</span>');
+    }) : Promise.resolve(),
 
+    Promise.all([
+      fetchGrammar(isES, raw).catch(function() { return {}; }),
+      fetchVerbs(isES, raw).catch(function() { return []; })
+    ]).then(function(res) {
+      var gramData = {
+        analysis: (res[0].analysis || []),
+        notes: (res[0].notes || ''),
+        verbs: res[1]
+      };
+      renderGram(gramData, mode);
+    })
+  ];
+
+  await Promise.all(tasks);
+
+  // 예제는 마지막에
   try { renderEx(await fetchExamples(isES, raw), mode); }
   catch(e) { setHTML('r-ex-' + mode, '<span class="err-txt">오류 발생</span>'); }
 
-  var gramData = {};
-  try {
-    var gram = await fetchGrammar(isES, raw);
-    gramData.analysis = gram.analysis || [];
-    gramData.notes = gram.notes || '';
-    setHTML('r-gram-' + mode, '<span class="ph">동사 변환 로딩 중...</span>');
-  } catch(e) { gramData.analysis = []; }
-
-  try {
-    gramData.verbs = await fetchVerbs(isES, raw);
-  } catch(e) { gramData.verbs = []; }
-
-  renderGram(gramData, mode);
   btn.disabled = false;
   btn.innerHTML = '번역';
 }
