@@ -337,31 +337,29 @@ function getESPrompt(text) {
     'Translate ALL lines of this Spanish text to Korean completely. Do not skip any sentence. Preserve line breaks with \\n.\n' +
     'Analyze this Spanish text:\n' +
     '{"translation":"한국어번역(줄바꿈유지)",' +
-    '"correction":{"is_correct":true,"errors":[{"error":"오류","fix":"수정","desc":"이유"}],"result":"교정문","native_tip":"원어민팁","native_text":"원어민ES표현","native_sub":"한국어설명20자이내"},' +
-    '"grammar":[{"tag":"문법표현","desc":"구체적설명"},{"tag":"시제","desc":"설명"},{"tag":"표현법","desc":"설명"}],' +
+    '"correction":{"is_correct":true,"errors":[{"error":"오류","fix":"수정","desc":"이유"}],"result":"교정문","native_tip":"표현차이설명(20자이내,실제내용만)","native_text":"원어민ES표현","native_sub":"한국어설명20자이내"},' +
+    '"grammar":[{"tag":"문법유형 (예: 날씨표현 · hace frio)","desc":"한국어설명"},{"tag":"시제 (예: 현재형 · habla)","desc":"한국어설명"},{"tag":"표현법 (예: 접속사 · que)","desc":"한국어설명"}],' +
     '"key_verb":{"infinitive":"ES원형","meaning":"한국어뜻","conjugations":[{"pronoun":"yo","form":""},{"pronoun":"tú","form":""},{"pronoun":"él/ella","form":""},{"pronoun":"nosotros","form":""},{"pronoun":"vosotros","form":""},{"pronoun":"ellos","form":""}]}}\n' +
     'Spanish: ' + text;
 }
 
 function getKOPrompt(text) {
-  return 'You are a Spanish tutor. JSON only, no markdown.\n' +
-    'STEP 1: Translate the Korean input into Spanish (Latin alphabet only).\n' +
-    'STEP 2: Suggest a more natural Spanish expression a native speaker would say.\n' +
-    'STEP 3: Analyze the grammar of the SPANISH TRANSLATION (NOT the Korean input). Explain Spanish grammar points in Korean.\n\n' +
-    'STRICT FIELD RULES:\n' +
-    '- "translation": Spanish text only (Latin alphabet). Translate every line. Preserve line breaks with \\n.\n' +
-    '- "native_text": Spanish text only (Latin alphabet). A more natural Spanish version.\n' +
-    '- "native_tip": Korean explanation of the difference (20 chars max).\n' +
-    '- "grammar[].tag": Short Korean label for the Spanish grammar point (e.g. 날씨표현, 접속법, 전치사).\n' +
-    '- "grammar[].desc": Korean explanation of the SPANISH grammar. Do NOT explain Korean grammar.\n' +
-    '- "key_verb.infinitive": Spanish infinitive (Latin alphabet).\n' +
-    '- "key_verb.meaning": Korean meaning.\n\n' +
-    'Return JSON:\n' +
-    '{"translation":"Spanish here",' +
-    '"native_text":"Spanish here",' +
-    '"native_tip":"한국어",' +
-    '"grammar":[{"tag":"스페인어문법태그","desc":"스페인어 문법 설명 한국어로"},{"tag":"시제","desc":"설명"},{"tag":"표현법","desc":"설명"}],' +
-    '"key_verb":{"infinitive":"Spanish","meaning":"한국어",' +
+  return 'Spanish tutor. JSON only, no markdown.\n' +
+    'Translate Korean to Spanish, then analyze the SPANISH grammar.\n\n' +
+    'RULES:\n' +
+    '- translation: ALL lines in Spanish (Latin alphabet). Preserve line breaks as \\n.\n' +
+    '- native_text: More natural Spanish a native speaker would use (Latin alphabet).\n' +
+    '- native_tip: 20자이내 한국어로 차이 설명.\n' +
+    '- grammar[].tag: 형식 반드시 "한국어라벨 · 스페인어표현". 실제 번역된 문장의 스페인어 단어/구조를 써야 함. 한국어 문법 라벨 금지. 예시: "날씨표현 · hace viento", "목적전치사 · para pasear", "현재시제 · sopla".\n' +
+    '- grammar[].desc: 해당 스페인어 문법 포인트를 한국어로 간결하게 설명. 한국어 문법 설명 금지.\n' +
+    '- key_verb.infinitive: 스페인어 동사원형.\n' +
+    '- key_verb.meaning: 한국어 뜻.\n\n' +
+    'JSON:\n' +
+    '{"translation":"스페인어번역",' +
+    '"native_text":"원어민스페인어표현",' +
+    '"native_tip":"차이설명",' +
+    '"grammar":[{"tag":"태그 · 스페인어표현","desc":"한국어설명"},{"tag":"태그 · 스페인어표현","desc":"한국어설명"},{"tag":"태그 · 스페인어표현","desc":"한국어설명"}],' +
+    '"key_verb":{"infinitive":"동사원형","meaning":"한국어뜻",' +
     '"conjugations":[{"pronoun":"yo","form":""},{"pronoun":"tú","form":""},{"pronoun":"él/ella","form":""},{"pronoun":"nosotros","form":""},{"pronoun":"vosotros","form":""},{"pronoun":"ellos","form":""}]}}\n' +
     'Korean input: ' + text;
 }
