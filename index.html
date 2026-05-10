@@ -271,24 +271,23 @@ async function callAPI(prompt, input) {
 
 // 번역 (해석)
 async function fetchTranslation(isES, text) {
-  var p = RULE + 'Spanish tutor. JSON only.\n' +
+  var p = RULE + 'You are a translator. Respond with ONLY a JSON object. No other text, no repetition of the input.\n' +
     (isES
-      ? 'Translate ALL of this Spanish text to Korean. Preserve line breaks with \\n. Return {"translation":"전체한국어번역"}'
-      : 'Translate ALL of this Korean text to Spanish. Preserve line breaks with \\n. Return {"translation":"full Spanish translation"}') +
-    '\nTranslate every sentence. Keep original line structure.\nInput: ' + text;
+      ? 'Translate the following Spanish text to Korean. Output ONLY the translation, not the original. Return: {"translation":"한국어번역만"}'
+      : 'Translate the following Korean text to Spanish. Output ONLY the translation, not the original. Return: {"translation":"Spanish translation only"}') +
+    '\nPreserve line breaks. Do NOT repeat the source text in the output.\nText to translate: ' + text;
   var r = await callAPI(p, text);
   var t = r.translation || '-';
-  // \n 문자열을 실제 줄바꿈으로 변환
   t = t.replace(/\\n/g, '\n');
   return t;
 }
 
 // 교정 (ES only)
 async function fetchCorrection(text) {
-  var p = RULE + 'Spanish tutor. JSON only.\n' +
-    'Check grammar of this Spanish text. Suggest natural native expressions.\n' +
-    'Return: {"original":"원문","errors":[{"error":"오류설명","fix":"수정","desc":"이유"}],"result":"교정문"}\n' +
-    'If no errors set errors:[].\nInput: ' + text;
+  var p = RULE + 'You are a Spanish grammar checker. Respond with ONLY a JSON object. No repetition of input.\n' +
+    'Check the grammar of this Spanish text and suggest natural native expressions.\n' +
+    'Return ONLY: {"original":"원문텍스트","errors":[{"error":"오류설명","fix":"수정된표현","desc":"이유"}],"result":"최종교정문"}\n' +
+    'If no errors set errors:[]. Do NOT repeat the source text outside of the JSON fields.\nSpanish text: ' + text;
   return await callAPI(p, text);
 }
 
