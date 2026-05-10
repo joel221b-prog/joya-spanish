@@ -239,6 +239,23 @@
 var MAX_LINES = 5;
 var RULE = 'Korean Hangul only in all Korean fields. No Chinese or Japanese characters.\n';
 
+function dedupText(t) {
+  if (!t) return t;
+  t = t.replace(/\\n/g, '\n').trim();
+  var lines = t.split('\n');
+  // 정확히 절반으로 반복되는 경우 제거
+  var half = Math.floor(lines.length / 2);
+  if (half >= 1) {
+    var first = lines.slice(0, half).join('\n').trim();
+    var second = lines.slice(-half).join('\n').trim();
+    if (first === second) return first;
+  }
+  // 문자열이 반으로 나뉘어 반복되는 경우
+  var mid = Math.floor(t.length / 2);
+  if (t.slice(0, mid).trim() === t.slice(mid).trim()) return t.slice(0, mid).trim();
+  return t;
+}
+
 function switchTab(t) {
   ['es','ko','conj'].forEach(function(id) {
     document.getElementById('tab-' + id).classList.toggle('on', id === t);
@@ -413,7 +430,7 @@ async function doTranslate(mode) {
     setHTML('r-gram-es', '<span class="ph">분석 중...</span>');
     try {
       var p = await callAPI(getESPrompt(raw), raw);
-      transEl.textContent = (p.translation || '-').replace(/\\n/g, '\n');
+      transEl.textContent = dedupText(p.translation || '-');
       setHTML('r-corr-es', renderCorr(p.correction));
       setHTML('r-gram-es', renderGram(p.grammar, p.key_verb));
     } catch(e) {
@@ -428,7 +445,7 @@ async function doTranslate(mode) {
     setHTML('r-gram-ko', '<span class="ph">분석 중...</span>');
     try {
       var p = await callAPI(getKOPrompt(raw), raw);
-      transKo.textContent = (p.translation || '-').replace(/\\n/g, '\n');
+      transKo.textContent = dedupText(p.translation || '-');
       if (p.native_text) {
         var nb = '<div class="native-box"><div class="native-lbl">원어민 표현</div>';
         nb += '<div class="native-txt">' + p.native_text + '</div>';
