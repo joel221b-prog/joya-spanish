@@ -9,156 +9,155 @@
   <style>
     *,*::before,*::after{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
     :root{
-      --p:#7C5CBF;--pl:#F3EEFF;--pm:#C4ADEE;
+      --p:#7C5CBF;--pl:#F3EEFF;--pm:#C4ADEE;--pd:#6A4DAD;
       --bg:#F5F4F9;--white:#fff;
       --ink:#111;--ink2:#555;--ink3:#999;
       --b:rgba(0,0,0,0.08);--b2:rgba(0,0,0,0.06);
       --green:#1A7A4A;--gbg:#EDFAF3;
       --amber:#8A5A00;--abg:#FFF8EC;
       --teal:#1A6B5A;--tbg:#EDFAF5;
-      --red:#A32020;--rbg:#FFF0F0;
-      --r:16px;--rx:8px;
+      --red:#A32020;
+      --r:16px;
     }
-    html,body{height:100%}
-    body{font-family:'Noto Sans KR',sans-serif;background:var(--bg);color:var(--ink);max-width:480px;margin:0 auto;min-height:100%}
+    html,body{min-height:100%}
+    body{font-family:'Noto Sans KR',sans-serif;background:var(--bg);color:var(--ink);max-width:480px;margin:0 auto}
 
-    /* HEADER */
-    .hd{background:var(--white);padding:14px 16px;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid var(--b);position:sticky;top:0;z-index:20}
-    .hd::after{content:"";position:absolute;bottom:0;left:0;right:0;height:2px;background:linear-gradient(90deg,var(--p) 0%,#9B7FD4 60%,transparent 100%)}
+    /* ── TOP CARD (header + tabs + input) ── */
+    .top-card{background:var(--white);border-radius:0 0 20px 20px;padding:14px 16px 16px;border:0.5px solid var(--b);margin-bottom:12px;position:sticky;top:0;z-index:20;box-shadow:0 2px 12px rgba(0,0,0,0.06)}
+    .hd-row{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px}
     .hd-name{font-family:'DM Sans',sans-serif;font-weight:500;font-size:20px;color:var(--p);letter-spacing:-0.5px}
     .hd-sub{font-size:11px;color:var(--ink3);margin-top:1px}
-    .hd-ver{font-size:10px;color:var(--pm);background:var(--pl);padding:3px 8px;border-radius:100px;font-family:'DM Sans',sans-serif}
+    .hd-ver{font-size:10px;color:var(--pm);background:var(--pl);padding:3px 9px;border-radius:100px;font-family:'DM Sans',sans-serif}
 
-    /* TABS */
-    .tabs{display:flex;background:var(--white);border-bottom:1px solid var(--b);padding:0 16px;position:sticky;top:57px;z-index:19}
-    .tab{flex:1;padding:12px 6px;border:none;background:none;font-size:13px;font-weight:500;color:var(--ink3);font-family:'Noto Sans KR',sans-serif;cursor:pointer;border-bottom:2px solid transparent;transition:all 0.2s;white-space:nowrap}
-    .tab.on{color:var(--p);border-bottom-color:var(--p)}
+    /* pill tabs */
+    .tabs{display:flex;background:#F0EDF9;border-radius:100px;padding:3px;margin-bottom:12px}
+    .tab{flex:1;padding:9px 6px;border:none;background:none;font-size:13px;font-weight:500;color:var(--ink3);font-family:'Noto Sans KR',sans-serif;cursor:pointer;border-radius:100px;transition:all 0.18s;white-space:nowrap;text-align:center}
+    .tab.on{background:var(--p);color:white}
 
-    /* PANELS */
-    .panel{display:none;padding:16px 16px 80px}
-    .panel.on{display:block}
-
-    /* INPUT CARD */
-    .inp-card{background:var(--white);border-radius:var(--r);border:0.5px solid var(--b);padding:14px;margin-bottom:12px}
-    .inp-wrap{background:#FAFAFA;border:1.5px solid var(--b);border-radius:12px;padding:12px 14px;transition:border-color 0.2s}
-    .inp-wrap:focus-within{border-color:var(--p)}
-    .inp-wrap.err{border-color:var(--red)}
-    textarea{width:100%;min-height:52px;border:none;outline:none;font-size:15px;font-family:'Noto Sans KR',sans-serif;color:var(--ink);background:transparent;resize:none;line-height:1.6;overflow:hidden}
+    /* textarea input */
+    .inp-box{background:#FAFAFA;border:1.5px solid var(--b);border-radius:14px;padding:12px 14px;transition:border-color 0.2s,box-shadow 0.2s}
+    .inp-box:focus-within{border-color:var(--p);box-shadow:0 0 0 3px rgba(124,92,191,0.1)}
+    .inp-box.err{border-color:var(--red)}
+    textarea{width:100%;min-height:48px;border:none;outline:none;font-size:15px;font-family:'Noto Sans KR',sans-serif;color:var(--ink);background:transparent;resize:none;line-height:1.65;overflow:hidden}
     textarea::placeholder{color:var(--ink3);font-weight:300}
     .inp-foot{display:flex;align-items:center;justify-content:space-between;margin-top:10px;gap:8px}
     .inp-left{display:flex;flex-direction:column;gap:2px}
     .inp-hint{font-size:11px;color:var(--ink3)}
     .limit-msg{font-size:11px;color:var(--red);display:none}
-    .btn-go{padding:10px 20px;background:var(--p);color:white;border:none;border-radius:100px;font-size:13px;font-weight:500;font-family:'Noto Sans KR',sans-serif;cursor:pointer;box-shadow:0 2px 8px rgba(124,92,191,0.3);display:flex;align-items:center;gap:6px;flex-shrink:0;transition:all 0.18s}
-    .btn-go:disabled{background:#ccc;box-shadow:none;cursor:default}
+    .btn-go{padding:10px 22px;background:var(--p);color:white;border:none;border-radius:100px;font-size:13px;font-weight:500;font-family:'Noto Sans KR',sans-serif;cursor:pointer;box-shadow:0 2px 8px rgba(124,92,191,0.35);display:flex;align-items:center;gap:6px;flex-shrink:0;transition:all 0.18s}
+    .btn-go:active{transform:scale(0.97)}
+    .btn-go:disabled{background:#ccc;box-shadow:none;cursor:default;transform:none}
     .spin{width:14px;height:14px;border:2px solid rgba(255,255,255,0.3);border-top-color:white;border-radius:50%;animation:spin 0.7s linear infinite}
     @keyframes spin{to{transform:rotate(360deg)}}
 
-    /* CONJ INPUT */
-    .conj-inp-row{display:flex;gap:8px}
-    .conj-inp-row input{flex:1;padding:11px 16px;border:1.5px solid var(--b);border-radius:100px;font-size:14px;font-family:'Noto Sans KR',sans-serif;outline:none;color:var(--ink);background:#FAFAFA;transition:border-color 0.2s}
-    .conj-inp-row input:focus{border-color:var(--teal)}
-    .btn-conj{padding:11px 20px;background:var(--teal);color:white;border:none;border-radius:100px;font-size:13px;font-weight:500;font-family:'Noto Sans KR',sans-serif;cursor:pointer;box-shadow:0 2px 8px rgba(26,107,90,0.25);white-space:nowrap;transition:all 0.18s}
+    /* conj input */
+    .conj-row{display:flex;gap:8px}
+    .conj-row input{flex:1;padding:11px 16px;border:1.5px solid var(--b);border-radius:100px;font-size:14px;font-family:'Noto Sans KR',sans-serif;outline:none;color:var(--ink);background:#FAFAFA;transition:border-color 0.2s}
+    .conj-row input:focus{border-color:var(--teal);box-shadow:0 0 0 3px rgba(26,107,90,0.08)}
+    .btn-conj{padding:11px 22px;background:var(--teal);color:white;border:none;border-radius:100px;font-size:13px;font-weight:500;font-family:'Noto Sans KR',sans-serif;cursor:pointer;box-shadow:0 2px 8px rgba(26,107,90,0.3);white-space:nowrap;transition:all 0.18s}
+    .btn-conj:active{transform:scale(0.97)}
     .btn-conj:disabled{background:#ccc;box-shadow:none;cursor:default}
+    .conj-hint{font-size:11px;color:var(--ink3);margin-top:8px}
 
-    /* RESULT CARD */
-    .result-card{background:var(--white);border-radius:var(--r);border:0.5px solid var(--b);overflow:hidden;margin-bottom:0}
+    /* ── PANELS ── */
+    .panel{display:none;padding:0 16px 80px}
+    .panel.on{display:block}
+
+    /* ── RESULT CARD ── */
+    .result-card{background:var(--white);border-radius:var(--r);border:0.5px solid var(--b);overflow:hidden}
     .sec{padding:14px 16px;border-bottom:1px solid var(--b2)}
     .sec:last-child{border-bottom:none}
-    .sec-title{display:flex;align-items:center;gap:6px;margin-bottom:8px}
+    .sec-hd{display:flex;align-items:center;gap:6px;margin-bottom:10px}
     .sec-dot{width:5px;height:5px;border-radius:50%;flex-shrink:0}
-    .sec-label{font-size:11px;font-weight:600;letter-spacing:0.05em;text-transform:uppercase}
+    .sec-lbl{font-size:11px;font-weight:600;letter-spacing:0.05em;text-transform:uppercase}
     .dot-p{background:var(--p)}.lbl-p{color:var(--p)}
     .dot-g{background:var(--green)}.lbl-g{color:var(--green)}
     .dot-a{background:var(--amber)}.lbl-a{color:var(--amber)}
     .dot-t{background:var(--teal)}.lbl-t{color:var(--teal)}
 
-    /* TEXT */
     .trans-text{font-size:15px;color:var(--ink);line-height:1.7;white-space:pre-wrap;word-break:break-word}
     .ph{color:var(--ink3);font-size:13px;font-style:italic}
     .err-txt{color:var(--red);font-size:13px}
 
-    /* NATIVE EXPRESSION BOX */
+    /* native box */
     .native-box{background:var(--pl);border-radius:10px;padding:10px 12px;margin-top:10px}
-    .native-label{font-size:11px;color:#9B7FD4;font-weight:600;margin-bottom:4px}
-    .native-text{font-size:13px;color:#6A4DAD;font-style:italic;margin-bottom:2px}
+    .native-lbl{font-size:11px;color:#9B7FD4;font-weight:600;margin-bottom:4px}
+    .native-txt{font-size:14px;color:var(--pd);font-style:italic;line-height:1.6;margin-bottom:2px;white-space:pre-wrap}
     .native-sub{font-size:11px;color:var(--ink3)}
 
-    /* OK BADGE */
+    /* correction */
     .ok-line{display:flex;align-items:center;gap:8px;color:var(--green);font-weight:500;font-size:14px;margin-bottom:8px}
     .ok-icon{width:20px;height:20px;background:var(--green);border-radius:50%;display:flex;align-items:center;justify-content:center;color:white;font-size:11px;flex-shrink:0}
-
-    /* CORRECTION */
-    .corr-chip{display:inline-block;font-size:10px;font-weight:600;text-transform:uppercase;padding:2px 7px;border-radius:5px;margin-bottom:3px}
-    .chip-err{background:var(--rbg);color:var(--red)}
+    .chip{display:inline-block;font-size:10px;font-weight:600;text-transform:uppercase;padding:2px 8px;border-radius:5px;margin-bottom:3px}
+    .chip-err{background:#FFF0F0;color:var(--red)}
     .chip-fix{background:var(--gbg);color:var(--green)}
     .chip-desc{background:#EDF4FF;color:#185FA5}
-    .chip-result{background:var(--pl);color:var(--p)}
-    .corr-val{font-size:14px;line-height:1.6;color:var(--ink);margin-bottom:6px;padding-left:2px;white-space:pre-wrap;word-break:break-word}
-    .corr-sep{border:none;border-top:1px solid var(--b2);margin:8px 0}
+    .chip-res{background:var(--pl);color:var(--p)}
+    .cv{font-size:14px;line-height:1.6;color:var(--ink);margin-bottom:6px;padding-left:2px;white-space:pre-wrap;word-break:break-word}
+    .sep{border:none;border-top:1px solid var(--b2);margin:8px 0}
 
-    /* GRAMMAR ITEMS */
+    /* grammar */
     .gram-list{display:flex;flex-direction:column;gap:8px}
     .gram-item{display:flex;gap:10px;align-items:flex-start}
-    .gram-tag{font-size:10px;font-weight:600;padding:2px 7px;border-radius:5px;background:var(--abg);color:var(--amber);white-space:nowrap;flex-shrink:0;margin-top:1px}
+    .gram-tag{font-size:10px;font-weight:600;padding:3px 8px;border-radius:5px;background:var(--abg);color:var(--amber);white-space:nowrap;flex-shrink:0;margin-top:1px}
     .gram-desc{font-size:13px;color:var(--ink2);line-height:1.6}
 
-    /* MINI CONJUGATION */
-    .mini-conj{margin-top:10px;padding-top:10px;border-top:1px solid var(--b2)}
-    .mini-label{font-size:11px;color:var(--ink3);margin-bottom:6px}
+    /* mini conjugation */
+    .mini-conj{margin-top:12px;padding-top:12px;border-top:1px solid var(--b2)}
+    .mini-lbl{font-size:11px;color:var(--ink3);margin-bottom:6px}
     .mini-grid{display:grid;grid-template-columns:1fr 1fr;gap:4px}
-    .mini-cell{display:flex;justify-content:space-between;background:#FAFAFA;border:1px solid var(--b);border-radius:7px;padding:5px 8px;font-size:12px}
-    .mini-pro{color:var(--ink3)}
-    .mini-form{font-weight:500;color:var(--p);font-family:'DM Sans',sans-serif}
+    .mini-cell{display:flex;justify-content:space-between;align-items:center;background:#FAFAFA;border:1px solid var(--b);border-radius:7px;padding:5px 9px}
+    .mini-pro{font-size:11px;color:var(--ink3)}
+    .mini-form{font-size:13px;font-weight:500;color:var(--p);font-family:'DM Sans',sans-serif}
 
-    /* CONJUGATION TABLE */
-    .conj-result-card{background:var(--white);border-radius:var(--r);border:0.5px solid var(--b);overflow:hidden}
-    .conj-hd{padding:14px 16px 12px;border-bottom:1px solid var(--b2)}
-    .conj-verb-name{font-family:'DM Sans',sans-serif;font-size:24px;font-weight:500;color:var(--ink)}
-    .conj-verb-type{font-size:12px;color:var(--ink3);margin-top:2px}
-    .conj-meanings{display:flex;gap:6px;margin-top:8px;flex-wrap:wrap}
-    .conj-mean-badge{background:var(--tbg);color:var(--teal);font-size:13px;font-weight:500;padding:4px 12px;border-radius:100px;border:1px solid rgba(26,107,90,0.15)}
-    .conj-nf-row{display:flex;gap:24px;margin-top:12px;padding-top:10px;border-top:1px solid var(--b2)}
-    .conj-nf-item{display:flex;align-items:center;gap:8px}
-    .conj-nf-label{font-size:10px;font-weight:600;color:var(--ink3);text-transform:uppercase;letter-spacing:0.04em}
-    .conj-nf-form{font-size:15px;font-weight:500;color:var(--teal);font-family:'DM Sans',sans-serif}
-    .tense-block{border-bottom:1px solid var(--b2)}
-    .tense-block:last-child{border-bottom:none}
-    .tense-hd{padding:10px 16px 7px;display:flex;align-items:center;gap:8px}
+    /* ── CONJ TAB ── */
+    .conj-card{background:var(--white);border-radius:var(--r);border:0.5px solid var(--b);overflow:hidden}
+    .conj-hd{padding:16px 16px 12px;border-bottom:1px solid var(--b2)}
+    .conj-name{font-family:'DM Sans',monospace;font-size:26px;font-weight:500;color:var(--ink);letter-spacing:-0.5px}
+    .conj-type{font-size:12px;color:var(--ink3);margin-top:2px}
+    .conj-meanings{display:flex;gap:6px;margin-top:10px;flex-wrap:wrap}
+    .conj-badge{background:var(--tbg);color:var(--teal);font-size:13px;font-weight:500;padding:4px 12px;border-radius:100px;border:1px solid rgba(26,107,90,0.15)}
+    .conj-nf{display:flex;gap:24px;margin-top:12px;padding-top:10px;border-top:1px solid var(--b2)}
+    .nf-item{display:flex;align-items:center;gap:8px}
+    .nf-lbl{font-size:10px;font-weight:600;color:var(--ink3);text-transform:uppercase;letter-spacing:0.04em}
+    .nf-form{font-size:15px;font-weight:500;color:var(--teal);font-family:'DM Sans',sans-serif}
+
+    /* tense block */
+    .tense-wrap{border-bottom:1px solid var(--b2)}
+    .tense-wrap:last-child{border-bottom:none}
+    .tense-hd{padding:11px 16px 8px;display:flex;align-items:center;gap:8px;cursor:pointer;user-select:none}
     .tense-badge{font-size:10px;font-weight:600;padding:3px 10px;border-radius:100px;background:var(--teal);color:white}
     .tense-name{font-size:12px;color:var(--ink3)}
+    .tense-arrow{font-size:11px;color:var(--ink3);margin-left:auto;transition:transform 0.2s}
+    .tense-arrow.open{transform:rotate(180deg)}
     .tense-grid{padding:0 16px 10px;display:grid;grid-template-columns:1fr 1fr;gap:4px 10px}
-    .tense-cell{display:flex;justify-content:space-between;background:#FAFAFA;border:1px solid var(--b);border-radius:7px;padding:5px 8px}
+    .tense-cell{display:flex;justify-content:space-between;align-items:center;background:#FAFAFA;border:1px solid var(--b);border-radius:7px;padding:5px 9px}
     .tense-pro{font-size:11px;color:var(--ink3)}
     .tense-form{font-size:13px;font-weight:500;color:var(--teal);font-family:'DM Sans',sans-serif}
-    .more-tenses{padding:10px 16px;display:flex;flex-wrap:wrap;gap:6px;align-items:center}
-    .more-badge{font-size:11px;background:#F0F0F0;color:#666;padding:4px 10px;border-radius:100px;cursor:pointer;border:none;font-family:'Noto Sans KR',sans-serif}
-    .more-badge.active{background:var(--tbg);color:var(--teal)}
-    .expand-btn{font-size:11px;color:var(--p);background:none;border:none;cursor:pointer;padding:4px 2px;font-family:'Noto Sans KR',sans-serif}
-    .hidden-tenses{display:none}
-    .hidden-tenses.show{display:block}
+    .tense-body{display:none}
+    .tense-body.open{display:block}
   </style>
 </head>
 <body>
 
-<header class="hd">
-  <div>
-    <div class="hd-name">jOYA</div>
-    <div class="hd-sub">스페인어 번역기</div>
+<div class="top-card">
+  <div class="hd-row">
+    <div>
+      <div class="hd-name">jOYA</div>
+      <div class="hd-sub">스페인어 번역기</div>
+    </div>
+    <span class="hd-ver">v1.1 &middot; 20260510</span>
   </div>
-  <span class="hd-ver">v1.1 &middot; 20260510</span>
-</header>
 
-<nav class="tabs">
-  <button class="tab on" id="tab-es" onclick="switchTab('es')">ES 스페인어</button>
-  <button class="tab" id="tab-ko" onclick="switchTab('ko')">KR 한국어</button>
-  <button class="tab" id="tab-conj" onclick="switchTab('conj')">동사 변환표</button>
-</nav>
+  <div class="tabs">
+    <button class="tab on" id="tab-es" onclick="switchTab('es')">ES 스페인어</button>
+    <button class="tab" id="tab-ko" onclick="switchTab('ko')">KR 한국어</button>
+    <button class="tab" id="tab-conj" onclick="switchTab('conj')">동사표</button>
+  </div>
 
-<!-- ES 패널 -->
-<div class="panel on" id="panel-es">
-  <div class="inp-card">
-    <div class="inp-wrap" id="wrap-es">
+  <!-- ES input -->
+  <div id="inp-es">
+    <div class="inp-box" id="wrap-es">
       <textarea id="ta-es" placeholder="스페인어 문장을 입력하세요" rows="2"></textarea>
     </div>
     <div class="inp-foot">
@@ -169,28 +168,10 @@
       <button class="btn-go" id="btn-es" onclick="doTranslate('es')">번역</button>
     </div>
   </div>
-  <div id="result-es" style="display:none">
-    <div class="result-card">
-      <div class="sec" id="sec-trans-es">
-        <div class="sec-title"><span class="sec-dot dot-p"></span><span class="sec-label lbl-p">해석</span></div>
-        <div class="trans-text" id="r-trans-es"></div>
-      </div>
-      <div class="sec" id="sec-corr-es">
-        <div class="sec-title"><span class="sec-dot dot-g"></span><span class="sec-label lbl-g">교정 &amp; 자연스러운 표현</span></div>
-        <div id="r-corr-es"><span class="ph">로딩 중...</span></div>
-      </div>
-      <div class="sec" id="sec-gram-es">
-        <div class="sec-title"><span class="sec-dot dot-a"></span><span class="sec-label lbl-a">문법 포인트</span></div>
-        <div id="r-gram-es"><span class="ph">로딩 중...</span></div>
-      </div>
-    </div>
-  </div>
-</div>
 
-<!-- KO 패널 -->
-<div class="panel" id="panel-ko">
-  <div class="inp-card">
-    <div class="inp-wrap" id="wrap-ko">
+  <!-- KO input -->
+  <div id="inp-ko" style="display:none">
+    <div class="inp-box" id="wrap-ko">
       <textarea id="ta-ko" placeholder="한국어 문장을 입력하세요" rows="2"></textarea>
     </div>
     <div class="inp-foot">
@@ -201,15 +182,48 @@
       <button class="btn-go" id="btn-ko" onclick="doTranslate('ko')">번역</button>
     </div>
   </div>
+
+  <!-- CONJ input -->
+  <div id="inp-conj" style="display:none">
+    <div class="conj-row">
+      <input type="text" id="conj-input" placeholder="동사 원형 (예: hablar, ser, tener)" />
+      <button class="btn-conj" id="btn-conj" onclick="doConjugate()">변환</button>
+    </div>
+    <div class="conj-hint">스페인어 동사 원형을 입력하면 시제별 변환표를 보여드려요</div>
+  </div>
+</div>
+
+<!-- ES 패널 -->
+<div class="panel on" id="panel-es">
+  <div id="result-es" style="display:none">
+    <div class="result-card">
+      <div class="sec">
+        <div class="sec-hd"><span class="sec-dot dot-p"></span><span class="sec-lbl lbl-p">해석</span></div>
+        <div class="trans-text" id="r-trans-es"><span class="ph">번역 결과가 여기 표시됩니다</span></div>
+      </div>
+      <div class="sec">
+        <div class="sec-hd"><span class="sec-dot dot-g"></span><span class="sec-lbl lbl-g">교정 &amp; 자연스러운 표현</span></div>
+        <div id="r-corr-es"><span class="ph">로딩 중...</span></div>
+      </div>
+      <div class="sec">
+        <div class="sec-hd"><span class="sec-dot dot-a"></span><span class="sec-lbl lbl-a">문법 포인트</span></div>
+        <div id="r-gram-es"><span class="ph">로딩 중...</span></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- KO 패널 -->
+<div class="panel" id="panel-ko">
   <div id="result-ko" style="display:none">
     <div class="result-card">
       <div class="sec">
-        <div class="sec-title"><span class="sec-dot dot-p"></span><span class="sec-label lbl-p">스페인어 번역</span></div>
-        <div class="trans-text" id="r-trans-ko"></div>
+        <div class="sec-hd"><span class="sec-dot dot-p"></span><span class="sec-lbl lbl-p">스페인어 번역</span></div>
+        <div class="trans-text" id="r-trans-ko"><span class="ph">번역 결과가 여기 표시됩니다</span></div>
         <div id="r-native-ko"></div>
       </div>
       <div class="sec">
-        <div class="sec-title"><span class="sec-dot dot-a"></span><span class="sec-label lbl-a">문법 포인트</span></div>
+        <div class="sec-hd"><span class="sec-dot dot-a"></span><span class="sec-lbl lbl-a">문법 포인트</span></div>
         <div id="r-gram-ko"><span class="ph">로딩 중...</span></div>
       </div>
     </div>
@@ -218,13 +232,6 @@
 
 <!-- 동사 변환표 패널 -->
 <div class="panel" id="panel-conj">
-  <div class="inp-card">
-    <div class="conj-inp-row">
-      <input type="text" id="conj-input" placeholder="동사 원형 입력 (예: hablar, ser, tener)" />
-      <button class="btn-conj" id="btn-conj" onclick="doConjugate()">변환</button>
-    </div>
-    <div style="font-size:11px;color:var(--ink3);margin-top:8px">스페인어 동사 원형을 입력하면 시제별 변환표를 보여드려요</div>
-  </div>
   <div id="conj-result"></div>
 </div>
 
@@ -236,6 +243,7 @@ function switchTab(t) {
   ['es','ko','conj'].forEach(function(id) {
     document.getElementById('tab-' + id).classList.toggle('on', id === t);
     document.getElementById('panel-' + id).classList.toggle('on', id === t);
+    document.getElementById('inp-' + id).style.display = id === t ? 'block' : 'none';
   });
 }
 
@@ -262,7 +270,6 @@ document.getElementById('conj-input').addEventListener('keydown', function(e) {
 function setHTML(id, h) { document.getElementById(id).innerHTML = h; }
 function setText(id, t) { document.getElementById(id).textContent = t; }
 
-// API 호출 (재시도 3회)
 async function callOnce(prompt, input) {
   var ctrl = new AbortController();
   var timer = setTimeout(function() { ctrl.abort(); }, 15000);
@@ -307,49 +314,26 @@ async function callAPI(prompt, input) {
   throw new Error(lastErr.message);
 }
 
-// ── ES 번역 (1회 호출로 해석+교정+문법 전부)
 function getESPrompt(text) {
   return RULE +
-    'You are a Spanish tutor for Korean learners. JSON only, no markdown.\n' +
-    'Analyze this Spanish text and return:\n' +
-    '{\n' +
-    '  "translation": "한국어 번역 (줄바꿈 유지)",\n' +
-    '  "correction": {\n' +
-    '    "is_correct": true or false,\n' +
-    '    "errors": [{"error":"오류설명","fix":"수정","desc":"이유"}],\n' +
-    '    "result": "교정된 문장",\n' +
-    '    "native_tip": "원어민이 더 자연스럽게 쓰는 표현 (있으면)",\n' +
-    '    "native_text": "원어민 표현 스페인어",\n' +
-    '    "native_sub": "한국어 설명 (20자이내)"\n' +
-    '  },\n' +
-    '  "grammar": [\n' +
-    '    {"tag":"문법표현","desc":"설명(한국어,구체적)"},\n' +
-    '    {"tag":"시제","desc":"설명"},\n' +
-    '    {"tag":"표현법","desc":"설명"}\n' +
-    '  ],\n' +
-    '  "key_verb": {"infinitive":"스페인어원형","meaning":"한국어뜻",\n' +
-    '    "conjugations":[{"pronoun":"yo","form":""},{"pronoun":"tú","form":""},{"pronoun":"él/ella","form":""},{"pronoun":"nosotros","form":""},{"pronoun":"vosotros","form":""},{"pronoun":"ellos","form":""}]}\n' +
-    '}\n' +
+    'Spanish tutor for Korean learners. JSON only, no markdown.\n' +
+    'Analyze this Spanish text:\n' +
+    '{"translation":"한국어번역(줄바꿈유지)",' +
+    '"correction":{"is_correct":true,"errors":[{"error":"오류","fix":"수정","desc":"이유"}],"result":"교정문","native_tip":"원어민팁","native_text":"원어민ES표현","native_sub":"한국어설명20자이내"},' +
+    '"grammar":[{"tag":"문법표현","desc":"구체적설명"},{"tag":"시제","desc":"설명"},{"tag":"표현법","desc":"설명"}],' +
+    '"key_verb":{"infinitive":"ES원형","meaning":"한국어뜻","conjugations":[{"pronoun":"yo","form":""},{"pronoun":"tú","form":""},{"pronoun":"él/ella","form":""},{"pronoun":"nosotros","form":""},{"pronoun":"vosotros","form":""},{"pronoun":"ellos","form":""}]}}\n' +
     'Spanish: ' + text;
 }
 
-// ── KO 번역 (1회 호출로 번역+원어민표현+문법 전부)
 function getKOPrompt(text) {
   return RULE +
-    'You are a Spanish tutor for Korean learners. JSON only, no markdown.\n' +
-    'Translate this Korean text to Spanish and analyze:\n' +
-    '{\n' +
-    '  "translation": "Spanish translation (preserve line breaks)",\n' +
-    '  "native_text": "더 자연스러운 원어민 스페인어 표현",\n' +
-    '  "native_tip": "한국어로 차이점 설명 (20자이내)",\n' +
-    '  "grammar": [\n' +
-    '    {"tag":"문법표현","desc":"설명(한국어,구체적)"},\n' +
-    '    {"tag":"시제","desc":"설명"},\n' +
-    '    {"tag":"표현법","desc":"설명"}\n' +
-    '  ],\n' +
-    '  "key_verb": {"infinitive":"스페인어원형","meaning":"한국어뜻",\n' +
-    '    "conjugations":[{"pronoun":"yo","form":""},{"pronoun":"tú","form":""},{"pronoun":"él/ella","form":""},{"pronoun":"nosotros","form":""},{"pronoun":"vosotros","form":""},{"pronoun":"ellos","form":""}]}\n' +
-    '}\n' +
+    'Spanish tutor for Korean learners. JSON only, no markdown.\n' +
+    'Translate this Korean to Spanish and analyze:\n' +
+    '{"translation":"Spanish translation(preserve line breaks)",' +
+    '"native_text":"더자연스러운원어민ES표현",' +
+    '"native_tip":"한국어로차이점20자이내",' +
+    '"grammar":[{"tag":"문법표현","desc":"구체적설명"},{"tag":"시제","desc":"설명"},{"tag":"표현법","desc":"설명"}],' +
+    '"key_verb":{"infinitive":"ES원형","meaning":"한국어뜻","conjugations":[{"pronoun":"yo","form":""},{"pronoun":"tú","form":""},{"pronoun":"él/ella","form":""},{"pronoun":"nosotros","form":""},{"pronoun":"vosotros","form":""},{"pronoun":"ellos","form":""}]}}\n' +
     'Korean: ' + text;
 }
 
@@ -361,40 +345,36 @@ function renderCorr(c) {
   } else if (c.errors && c.errors.length) {
     for (var i = 0; i < c.errors.length; i++) {
       var e = c.errors[i];
-      if (i > 0) h += '<hr class="corr-sep">';
-      h += '<span class="corr-chip chip-err">오류</span><div class="corr-val">' + e.error + '</div>';
-      h += '<span class="corr-chip chip-fix">수정</span><div class="corr-val">' + e.fix + '</div>';
-      h += '<span class="corr-chip chip-desc">설명</span><div class="corr-val">' + e.desc + '</div>';
+      if (i > 0) h += '<hr class="sep">';
+      h += '<span class="chip chip-err">오류</span><div class="cv">' + e.error + '</div>';
+      h += '<span class="chip chip-fix">수정</span><div class="cv">' + e.fix + '</div>';
+      if (e.desc) h += '<span class="chip chip-desc">설명</span><div class="cv">' + e.desc + '</div>';
     }
-    if (c.result) {
-      h += '<hr class="corr-sep"><span class="corr-chip chip-result">최종 교정문</span><div class="corr-val" style="font-weight:500">' + c.result + '</div>';
-    }
+    if (c.result) h += '<hr class="sep"><span class="chip chip-res">최종 교정문</span><div class="cv" style="font-weight:500">' + c.result + '</div>';
   }
   if (c.native_text) {
-    h += '<div class="native-box"><div class="native-label">원어민 표현</div>';
-    h += '<div class="native-text">' + c.native_text + '</div>';
+    h += '<div class="native-box"><div class="native-lbl">원어민 표현</div>';
+    h += '<div class="native-txt">' + c.native_text + '</div>';
     if (c.native_sub) h += '<div class="native-sub">' + c.native_sub + '</div>';
     h += '</div>';
   }
-  return h;
+  return h || '<span class="ph">교정 정보 없음</span>';
 }
 
-function renderGram(arr, keyVerb) {
+function renderGram(arr, kv) {
   var h = '<div class="gram-list">';
   if (arr && arr.length) {
     for (var i = 0; i < arr.length; i++) {
       var a = arr[i];
-      if (!a.tag && !a.desc) continue;
+      if (!a || (!a.tag && !a.desc)) continue;
       h += '<div class="gram-item"><span class="gram-tag">' + (a.tag||'') + '</span><span class="gram-desc">' + (a.desc||'') + '</span></div>';
     }
   }
   h += '</div>';
-  if (keyVerb && keyVerb.infinitive && keyVerb.conjugations && keyVerb.conjugations.length) {
-    h += '<div class="mini-conj">';
-    h += '<div class="mini-label">핵심 동사 · <strong>' + keyVerb.infinitive + '</strong> ' + (keyVerb.meaning||'') + ' 현재형</div>';
-    h += '<div class="mini-grid">';
-    for (var j = 0; j < keyVerb.conjugations.length; j++) {
-      var c = keyVerb.conjugations[j];
+  if (kv && kv.infinitive && kv.conjugations && kv.conjugations.length) {
+    h += '<div class="mini-conj"><div class="mini-lbl">핵심 동사 · <b>' + kv.infinitive + '</b> ' + (kv.meaning||'') + ' 현재형</div><div class="mini-grid">';
+    for (var j = 0; j < kv.conjugations.length; j++) {
+      var c = kv.conjugations[j];
       h += '<div class="mini-cell"><span class="mini-pro">' + c.pronoun + '</span><span class="mini-form">' + c.form + '</span></div>';
     }
     h += '</div></div>';
@@ -411,81 +391,65 @@ async function doTranslate(mode) {
   var btn = document.getElementById('btn-' + mode);
   btn.disabled = true;
   btn.innerHTML = '<div class="spin"></div>';
-  var _reset = function() { btn.disabled = false; btn.innerHTML = '번역'; };
 
   var resultEl = document.getElementById('result-' + mode);
   resultEl.style.display = 'block';
 
   if (mode === 'es') {
-    // 해석만 먼저
     var transEl = document.getElementById('r-trans-es');
     transEl.textContent = '번역 중...';
     setHTML('r-corr-es', '<span class="ph">분석 중...</span>');
     setHTML('r-gram-es', '<span class="ph">분석 중...</span>');
-
     try {
       var p = await callAPI(getESPrompt(raw), raw);
-
-      // 해석
-      transEl.style.whiteSpace = 'pre-wrap';
       transEl.textContent = p.translation || '-';
-
-      // 교정
       setHTML('r-corr-es', renderCorr(p.correction));
-
-      // 문법
       setHTML('r-gram-es', renderGram(p.grammar, p.key_verb));
-
     } catch(e) {
       transEl.textContent = '오류: ' + e.message;
       setHTML('r-corr-es', '<span class="err-txt">결과를 불러올 수 없습니다</span>');
       setHTML('r-gram-es', '<span class="err-txt">결과를 불러올 수 없습니다</span>');
     }
-
   } else {
     var transKo = document.getElementById('r-trans-ko');
     transKo.textContent = '번역 중...';
     setHTML('r-native-ko', '');
     setHTML('r-gram-ko', '<span class="ph">분석 중...</span>');
-
     try {
       var p = await callAPI(getKOPrompt(raw), raw);
-
-      transKo.style.whiteSpace = 'pre-wrap';
       transKo.textContent = p.translation || '-';
-
       if (p.native_text) {
-        var nb = '<div class="native-box"><div class="native-label">원어민 표현</div>';
-        nb += '<div class="native-text">' + p.native_text + '</div>';
+        var nb = '<div class="native-box"><div class="native-lbl">원어민 표현</div>';
+        nb += '<div class="native-txt">' + p.native_text + '</div>';
         if (p.native_tip) nb += '<div class="native-sub">' + p.native_tip + '</div>';
         nb += '</div>';
         setHTML('r-native-ko', nb);
       }
-
       setHTML('r-gram-ko', renderGram(p.grammar, p.key_verb));
-
     } catch(e) {
       transKo.textContent = '오류: ' + e.message;
       setHTML('r-gram-ko', '<span class="err-txt">결과를 불러올 수 없습니다</span>');
     }
   }
 
-  _reset();
+  btn.disabled = false;
+  btn.innerHTML = '번역';
 }
 
-// 동사 변환표
+// ── 동사 변환표 ──
 async function doConjugate() {
   var verb = document.getElementById('conj-input').value.trim();
   if (!verb) return;
   var btn = document.getElementById('btn-conj');
   btn.disabled = true; btn.textContent = '...';
+  document.getElementById('conj-result').innerHTML = '';
 
   var r6 = '[{"pronoun":"yo","form":""},{"pronoun":"tú","form":""},{"pronoun":"él/ella","form":""},{"pronoun":"nosotros","form":""},{"pronoun":"vosotros","form":""},{"pronoun":"ellos","form":""}]';
   var r2 = '[{"pronoun":"tú","form":""},{"pronoun":"vosotros","form":""}]';
 
   var prompt = RULE + 'Spanish conjugation expert. JSON only.\n' +
     'Input: Spanish verb infinitive.\n' +
-    'Return: {"verb":"","meanings":["뜻1","뜻2","뜻3"],"verb_type":"동사유형(한국어)",' +
+    'Return: {"verb":"","meanings":["뜻1","뜻2","뜻3"],"verb_type":"유형 · -ar/-er/-ir형",' +
     '"nonfinite":{"past_participle":"","gerund":""},' +
     '"tenses":[' +
     '{"tense":"Presente","name_ko":"현재형","rows":' + r6 + '},' +
@@ -500,77 +464,58 @@ async function doConjugate() {
 
   try {
     var p = await callAPI(prompt, verb);
-
-    var h = '<div class="conj-result-card">';
-    h += '<div class="conj-hd">';
-    h += '<div class="conj-verb-name">' + p.verb + '</div>';
-    h += '<div class="conj-verb-type">' + (p.verb_type||'') + '</div>';
+    var h = '<div class="conj-card"><div class="conj-hd">';
+    h += '<div class="conj-name">' + p.verb + '</div>';
+    h += '<div class="conj-type">' + (p.verb_type||'') + '</div>';
     if (p.meanings && p.meanings.length) {
       h += '<div class="conj-meanings">';
-      for (var i = 0; i < p.meanings.length; i++) {
-        h += '<span class="conj-mean-badge">' + p.meanings[i] + '</span>';
-      }
+      for (var i = 0; i < p.meanings.length; i++) h += '<span class="conj-badge">' + p.meanings[i] + '</span>';
       h += '</div>';
     }
     if (p.nonfinite) {
-      h += '<div class="conj-nf-row">';
-      h += '<div class="conj-nf-item"><span class="conj-nf-label">과거분사</span><span class="conj-nf-form">' + (p.nonfinite.past_participle||'-') + '</span></div>';
-      h += '<div class="conj-nf-item"><span class="conj-nf-label">동명사</span><span class="conj-nf-form">' + (p.nonfinite.gerund||'-') + '</span></div>';
+      h += '<div class="conj-nf">';
+      h += '<div class="nf-item"><span class="nf-lbl">과거분사</span><span class="nf-form">' + (p.nonfinite.past_participle||'-') + '</span></div>';
+      h += '<div class="nf-item"><span class="nf-lbl">동명사</span><span class="nf-form">' + (p.nonfinite.gerund||'-') + '</span></div>';
       h += '</div>';
     }
     h += '</div>';
 
     if (p.tenses && p.tenses.length) {
-      // 처음 2개 시제 바로 표시
-      for (var i = 0; i < Math.min(2, p.tenses.length); i++) {
-        h += renderTense(p.tenses[i]);
-      }
-      // 나머지는 접기
-      if (p.tenses.length > 2) {
-        h += '<div class="more-tenses">';
-        for (var i = 2; i < p.tenses.length; i++) {
-          h += '<button class="more-badge" onclick="expandTense(this,' + i + ')">' + p.tenses[i].name_ko + '</button>';
-        }
-        h += '<button class="expand-btn" onclick="expandAll(this)">모두 보기 ↓</button>';
-        h += '</div>';
-        h += '<div class="hidden-tenses" id="hidden-t">';
-        for (var i = 2; i < p.tenses.length; i++) {
-          h += '<div id="tense-' + i + '" style="display:none">' + renderTense(p.tenses[i]) + '</div>';
-        }
-        h += '</div>';
+      for (var i = 0; i < p.tenses.length; i++) {
+        h += renderTenseBlock(p.tenses[i], i === 0);
       }
     }
     h += '</div>';
     document.getElementById('conj-result').innerHTML = h;
   } catch(e) {
-    document.getElementById('conj-result').innerHTML = '<p style="color:var(--red);font-size:13px;padding:12px 0">오류: ' + e.message + '</p>';
+    document.getElementById('conj-result').innerHTML = '<p style="color:var(--red);font-size:13px;padding:16px 0">오류: ' + e.message + '</p>';
   }
   btn.disabled = false; btn.textContent = '변환';
 }
 
-function renderTense(t) {
-  var h = '<div class="tense-block"><div class="tense-hd"><span class="tense-badge">' + t.tense + '</span><span class="tense-name">' + t.name_ko + '</span></div>';
+function renderTenseBlock(t, open) {
+  var bodyId = 'tb-' + Math.random().toString(36).substr(2,6);
+  var arrowId = 'ta-' + bodyId;
+  var h = '<div class="tense-wrap">';
+  h += '<div class="tense-hd" onclick="toggleTense(\'' + bodyId + '\',\'' + arrowId + '\')">';
+  h += '<span class="tense-badge">' + t.tense + '</span>';
+  h += '<span class="tense-name">' + t.name_ko + '</span>';
+  h += '<span class="tense-arrow' + (open ? ' open' : '') + '" id="' + arrowId + '">▾</span>';
+  h += '</div>';
+  h += '<div class="tense-body' + (open ? ' open' : '') + '" id="' + bodyId + '">';
   h += '<div class="tense-grid">';
   for (var j = 0; j < t.rows.length; j++) {
     h += '<div class="tense-cell"><span class="tense-pro">' + t.rows[j].pronoun + '</span><span class="tense-form">' + t.rows[j].form + '</span></div>';
   }
-  h += '</div></div>';
+  h += '</div></div></div>';
   return h;
 }
 
-function expandTense(btn, idx) {
-  var el = document.getElementById('tense-' + idx);
-  if (el) { el.style.display = 'block'; btn.classList.add('active'); }
-}
-
-function expandAll(btn) {
-  var hidden = document.getElementById('hidden-t');
-  if (hidden) {
-    hidden.classList.toggle('show');
-    btn.textContent = hidden.classList.contains('show') ? '접기 ↑' : '모두 보기 ↓';
-    var badges = document.querySelectorAll('.more-badge');
-    for (var i = 0; i < badges.length; i++) badges[i].classList.toggle('active', hidden.classList.contains('show'));
-  }
+function toggleTense(bodyId, arrowId) {
+  var body = document.getElementById(bodyId);
+  var arrow = document.getElementById(arrowId);
+  if (body) body.classList.toggle('open');
+  if (arrow) arrow.classList.toggle('open');
 }
 </script>
 </body>
