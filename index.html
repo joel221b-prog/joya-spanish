@@ -145,6 +145,10 @@
     .tense-row { display: flex; justify-content: space-between; align-items: center; padding: 6px 8px; background: #FAFAFA; border-radius: var(--r-xs); border: 1px solid var(--border); }
     .tense-pro { font-size: 11px; color: var(--ink-3); }
     .tense-form { font-size: 13px; font-weight: 500; color: var(--teal); font-family: 'DM Sans', sans-serif; }
+    .nonfinite-row { display: flex; gap: 10px; margin-top: 12px; flex-wrap: wrap; }
+    .nonfinite-item { display: flex; align-items: center; gap: 6px; background: var(--teal-bg); border: 1px solid rgba(26,107,90,0.12); padding: 6px 12px; border-radius: 100px; }
+    .nonfinite-label { font-size: 10px; font-weight: 600; color: var(--teal); letter-spacing: 0.05em; text-transform: uppercase; }
+    .nonfinite-form { font-size: 14px; font-weight: 500; color: var(--ink); font-family: 'DM Sans', sans-serif; }
   </style>
 </head>
 <body>
@@ -334,31 +338,17 @@ function renderGram(d, suffix) {
 }
 
 function getPrompt(isES, text) {
-  var rule = 'STRICT: All Korean fields must use ONLY Korean Hangul. NO Chinese characters, NO Japanese. Write 시청 not 市廳.\n\n';
+  var rule = 'Korean Hangul only in all Korean fields. No Chinese/Japanese chars.\n';
+  var conj = '[{"pronoun":"yo","form":"?"},{"pronoun":"tú","form":"?"},{"pronoun":"él/ella","form":"?"},{"pronoun":"nosotros","form":"?"},{"pronoun":"vosotros","form":"?"},{"pronoun":"ellos","form":"?"}]';
+  var verbSchema = '{"infinitive":"?","meaning":"한국어뜻","explanation":"한국어설명","conjugations":' + conj + '}';
+  var gramSchema = '{"analysis":[{"tag":"주어","desc":"?"},{"tag":"동사","desc":"?"},{"tag":"시제","desc":"?"}],"verbs":[' + verbSchema + '],"notes":"한국어"}';
+  var exSchema = '[{"es":"?","ko":"?"},{"es":"?","ko":"?"},{"es":"?","ko":"?"}]';
   if (isES) {
-    return rule + 'You are a Spanish tutor for Korean learners. Respond ONLY with valid JSON, no markdown.\n' +
-      'User inputs a Spanish sentence.\n' +
-      'For "examples": provide 3 SPANISH example sentences similar in topic/grammar to the input. The "es" field is the Spanish sentence, "ko" is its Korean translation.\n' +
-      'For "grammar": first provide "analysis" array with grammar breakdown of the input sentence (주어/동사/목적어/시제 등), then "verbs" array with conjugation.\n' +
-      'Return:\n' +
-      '{"translation":"한국어 번역","correction":{"original":"원문","errors":[{"error":"오류(한국어)","fix":"수정","desc":"설명"}],"result":"교정문"},' +
-      '"examples":[{"es":"비슷한 스페인어 예문1","ko":"한국어 번역"},{"es":"예문2","ko":"번역"},{"es":"예문3","ko":"번역"}],' +
-      '"grammar":{"analysis":[{"tag":"주어","desc":"설명(한국어)"},{"tag":"동사","desc":"설명"},{"tag":"시제","desc":"설명"}],' +
-      '"verbs":[{"infinitive":"원형","meaning":"뜻","explanation":"시제 설명(한국어)",' +
-      '"conjugations":[{"pronoun":"yo","form":""},{"pronoun":"tú","form":""},{"pronoun":"él/ella","form":""},{"pronoun":"nosotros","form":""},{"pronoun":"vosotros","form":""},{"pronoun":"ellos","form":""}]}],' +
-      '"notes":"문법 노트(한국어)"}}\n\nInput: ' + text;
+    var schema = '{"translation":"한국어번역","correction":{"original":"원문","errors":[{"error":"?","fix":"?","desc":"?"}],"result":"교정문"},"examples":' + exSchema + ',"grammar":' + gramSchema + '}';
+    return rule + 'Spanish tutor. JSON only. Input=Spanish. examples=3 similar Spanish sentences. grammar.analysis=breakdown in Korean. If no errors set errors:[].\nJSON: ' + schema + '\nInput: ' + text;
   } else {
-    return rule + 'You are a Spanish tutor for Korean learners. Respond ONLY with valid JSON, no markdown.\n' +
-      'User inputs a Korean sentence. Translate to Spanish. Do NOT correct Korean.\n' +
-      'For "examples": provide 3 SPANISH example sentences similar in topic to the input. The "es" field is Spanish, "ko" is Korean translation.\n' +
-      'For "grammar": analyze the SPANISH translation grammar.\n' +
-      'Return:\n' +
-      '{"translation":"Spanish translation","correction":{"original":"원문","errors":[],"result":"원문 그대로"},' +
-      '"examples":[{"es":"비슷한 스페인어 예문1","ko":"한국어 번역"},{"es":"예문2","ko":"번역"},{"es":"예문3","ko":"번역"}],' +
-      '"grammar":{"analysis":[{"tag":"주어","desc":"설명(한국어)"},{"tag":"동사","desc":"설명"},{"tag":"시제","desc":"설명"}],' +
-      '"verbs":[{"infinitive":"원형","meaning":"뜻","explanation":"시제 설명(한국어)",' +
-      '"conjugations":[{"pronoun":"yo","form":""},{"pronoun":"tú","form":""},{"pronoun":"él/ella","form":""},{"pronoun":"nosotros","form":""},{"pronoun":"vosotros","form":""},{"pronoun":"ellos","form":""}]}],' +
-      '"notes":"문법 노트(한국어)"}}\n\nInput: ' + text;
+    var schema = '{"translation":"ES번역","correction":{"original":"원문","errors":[],"result":"원문"},"examples":' + exSchema + ',"grammar":' + gramSchema + '}';
+    return rule + 'Spanish tutor. JSON only. Input=Korean→translate to Spanish. errors=[]. examples=3 similar Spanish sentences. grammar=analyze Spanish translation in Korean.\nJSON: ' + schema + '\nInput: ' + text;
   }
 }
 
@@ -411,19 +401,22 @@ async function doConjugate() {
   btn.disabled = true; btn.textContent = '...';
   document.getElementById('conj-result').innerHTML = '';
 
-  var prompt = 'STRICT: All Korean must be pure Hangul only.\n' +
-    'You are a Spanish conjugation expert. Respond ONLY with valid JSON, no markdown.\n' +
-    'User inputs a Spanish verb infinitive. Return:\n' +
-    '{"verb":"infinitive","meaning":"한국어 뜻","verb_type":"동사 유형(한국어, 예: -er 규칙동사)",' +
+  var rows6 = '[{"pronoun":"yo","form":"?"},{"pronoun":"tú","form":"?"},{"pronoun":"él/ella","form":"?"},{"pronoun":"nosotros","form":"?"},{"pronoun":"vosotros","form":"?"},{"pronoun":"ellos","form":"?"}]';
+  var rows2 = '[{"pronoun":"tú","form":"?"},{"pronoun":"vosotros","form":"?"}]';
+  var prompt = 'Spanish conjugation expert. JSON only, no markdown.\n' +
+    'Input: Spanish verb infinitive.\n' +
+    'Return: {"verb":"infinitive","meaning":"한국어뜻","verb_type":"동사유형(한국어)",' +
+    '"nonfinite":{"past_participle":"과거분사형","gerund":"동명사형"},' +
     '"tenses":[' +
-    '{"tense":"Presente","name_ko":"현재형","rows":[{"pronoun":"yo","form":""},{"pronoun":"tú","form":""},{"pronoun":"él/ella","form":""},{"pronoun":"nosotros","form":""},{"pronoun":"vosotros","form":""},{"pronoun":"ellos","form":""}]},' +
-    '{"tense":"Pretérito Indefinido","name_ko":"단순과거","rows":[같은 구조]},' +
-    '{"tense":"Pretérito Imperfecto","name_ko":"불완전과거","rows":[같은 구조]},' +
-    '{"tense":"Futuro Simple","name_ko":"단순미래","rows":[같은 구조]},' +
-    '{"tense":"Condicional","name_ko":"조건법","rows":[같은 구조]},' +
-    '{"tense":"Pretérito Perfecto","name_ko":"현재완료","rows":[같은 구조]},' +
-    '{"tense":"Subjuntivo Presente","name_ko":"현재 접속법","rows":[같은 구조]}' +
-    ']}\n\nVerb: ' + verb;
+    '{"tense":"Presente","name_ko":"현재형","rows":' + rows6 + '},' +
+    '{"tense":"Pretérito Indefinido","name_ko":"단순과거","rows":' + rows6 + '},' +
+    '{"tense":"Pretérito Imperfecto","name_ko":"불완전과거","rows":' + rows6 + '},' +
+    '{"tense":"Futuro Simple","name_ko":"단순미래","rows":' + rows6 + '},' +
+    '{"tense":"Condicional","name_ko":"조건법","rows":' + rows6 + '},' +
+    '{"tense":"Pretérito Perfecto","name_ko":"현재완료","rows":' + rows6 + '},' +
+    '{"tense":"Subjuntivo Presente","name_ko":"현재 접속법","rows":' + rows6 + '},' +
+    '{"tense":"Imperativo","name_ko":"명령문","rows":' + rows2 + '}' +
+    ']}\nVerb: ' + verb;
 
   try {
     var resp = await fetch('/.netlify/functions/translate', {
@@ -445,6 +438,12 @@ async function doConjugate() {
     h += '<div class="conj-verb-title">' + p.verb + '</div>';
     h += '<div class="conj-verb-sub">' + p.verb_type + '</div>';
     h += '<div class="conj-verb-mean-badge">' + p.meaning + '</div>';
+    if (p.nonfinite) {
+      h += '<div class="nonfinite-row">';
+      h += '<span class="nonfinite-item"><span class="nonfinite-label">과거분사</span><span class="nonfinite-form">' + (p.nonfinite.past_participle||'-') + '</span></span>';
+      h += '<span class="nonfinite-item"><span class="nonfinite-label">동명사</span><span class="nonfinite-form">' + (p.nonfinite.gerund||'-') + '</span></span>';
+      h += '</div>';
+    }
     h += '</div>';
 
     for (var i = 0; i < p.tenses.length; i++) {
