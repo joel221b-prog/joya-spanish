@@ -18,7 +18,7 @@ export default async (request, context) => {
 
   try {
     const body = await request.json();
-    const prompt = body.system + '\n\n사용자 입력: ' + body.messages[0].content;
+    const prompt = body.system + '\n\n' + body.messages[0].content;
 
     const url = 'https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent';
 
