@@ -317,6 +317,7 @@ async function callAPI(prompt, input) {
 function getESPrompt(text) {
   return RULE +
     'Spanish tutor for Korean learners. JSON only, no markdown.\n' +
+    'Translate ALL lines of this Spanish text to Korean completely. Do not skip any sentence. Preserve line breaks with \\n.\n' +
     'Analyze this Spanish text:\n' +
     '{"translation":"한국어번역(줄바꿈유지)",' +
     '"correction":{"is_correct":true,"errors":[{"error":"오류","fix":"수정","desc":"이유"}],"result":"교정문","native_tip":"원어민팁","native_text":"원어민ES표현","native_sub":"한국어설명20자이내"},' +
@@ -327,12 +328,12 @@ function getESPrompt(text) {
 
 function getKOPrompt(text) {
   return 'CRITICAL RULES:\n' +
-    '1. "translation" field: MUST be written in Spanish using Latin alphabet (e.g. Hace viento.). NEVER use Korean characters here.\n' +
+    '1. "translation" field: Translate EVERY line of the Korean input to Spanish. Use Latin alphabet only. NEVER skip any line. Preserve line breaks with \\n.\n' +
     '2. "native_text" field: MUST be written in Spanish using Latin alphabet. NEVER use Korean characters here.\n' +
     '3. "tag", "desc", "native_tip", "meaning" fields: write in Korean Hangul.\n' +
     '4. "infinitive", "pronoun", "form" fields: write in Spanish Latin alphabet.\n\n' +
     'Spanish tutor. JSON only, no markdown.\n' +
-    'Translate this Korean text to Spanish, then analyze the Spanish grammar.\n' +
+    'Translate ALL lines of this Korean text to Spanish completely. Do not skip any sentence.\n' +
     'Return this exact JSON structure:\n' +
     '{"translation":"[Spanish text here using Latin letters]",' +
     '"native_text":"[More natural Spanish expression using Latin letters]",' +
@@ -398,6 +399,10 @@ async function doTranslate(mode) {
   btn.disabled = true;
   btn.innerHTML = '<div class="spin"></div>';
 
+  // 이모지/특수문자 제거 (스페인어 특수문자는 유지)
+  raw = raw.replace(/[\u{1F300}-\u{1F9FF}|\u{2600}-\u{27BF}]/gu, '').trim();
+  if (!raw) { btn.disabled = false; btn.innerHTML = '번역'; return; }
+
   var resultEl = document.getElementById('result-' + mode);
   resultEl.style.display = 'block';
 
@@ -408,7 +413,7 @@ async function doTranslate(mode) {
     setHTML('r-gram-es', '<span class="ph">분석 중...</span>');
     try {
       var p = await callAPI(getESPrompt(raw), raw);
-      transEl.textContent = p.translation || '-';
+      transEl.textContent = (p.translation || '-').replace(/\\n/g, '\n');
       setHTML('r-corr-es', renderCorr(p.correction));
       setHTML('r-gram-es', renderGram(p.grammar, p.key_verb));
     } catch(e) {
@@ -423,7 +428,7 @@ async function doTranslate(mode) {
     setHTML('r-gram-ko', '<span class="ph">분석 중...</span>');
     try {
       var p = await callAPI(getKOPrompt(raw), raw);
-      transKo.textContent = p.translation || '-';
+      transKo.textContent = (p.translation || '-').replace(/\\n/g, '\n');
       if (p.native_text) {
         var nb = '<div class="native-box"><div class="native-lbl">원어민 표현</div>';
         nb += '<div class="native-txt">' + p.native_text + '</div>';
