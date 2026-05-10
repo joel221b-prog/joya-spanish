@@ -8,209 +8,67 @@
   <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;600&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
-
     :root {
-      --p: #7C5CBF;
-      --p-light: #F3EEFF;
-      --p-mid: #C4ADEE;
-      --surface: #FAFAFA;
-      --white: #FFFFFF;
-      --ink: #111111;
-      --ink-2: #555555;
-      --ink-3: #999999;
-      --border: rgba(0,0,0,0.07);
-      --border-focus: #7C5CBF;
-      --green: #1A7A4A;
-      --green-bg: #EDFAF3;
-      --blue: #1A5EAA;
-      --blue-bg: #EDF4FF;
-      --amber: #8A5A00;
-      --amber-bg: #FFF8EC;
-      --red: #A32020;
-      --red-bg: #FFF0F0;
-      --r: 20px;
-      --r-sm: 12px;
-      --r-xs: 8px;
+      --p: #7C5CBF; --p-light: #F3EEFF; --p-mid: #C4ADEE;
+      --surface: #FAFAFA; --white: #FFFFFF;
+      --ink: #111111; --ink-2: #555555; --ink-3: #999999;
+      --border: rgba(0,0,0,0.07); --border-2: rgba(0,0,0,0.12);
+      --green: #1A7A4A; --green-bg: #EDFAF3;
+      --blue: #1A5EAA; --blue-bg: #EDF4FF;
+      --amber: #8A5A00; --amber-bg: #FFF8EC;
+      --red: #A32020; --red-bg: #FFF0F0;
+      --teal: #1A6B5A; --teal-bg: #EDFAF5;
+      --r: 20px; --r-sm: 12px; --r-xs: 8px;
     }
-
     html, body { height: 100%; }
+    body { font-family: 'Noto Sans KR', sans-serif; background: var(--surface); color: var(--ink); max-width: 480px; margin: 0 auto; min-height: 100%; }
 
-    body {
-      font-family: 'Noto Sans KR', sans-serif;
-      background: var(--surface);
-      color: var(--ink);
-      max-width: 480px;
-      margin: 0 auto;
-      min-height: 100%;
-    }
-
-    /* ── HEADER ── */
-    .hd {
-      background: var(--white);
-      padding: 16px 20px 14px;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      border-bottom: 1px solid var(--border);
-      position: sticky;
-      top: 0;
-      z-index: 20;
-    }
+    /* HEADER */
+    .hd { background: var(--white); padding: 16px 20px 14px; display: flex; align-items: center; justify-content: space-between; border-bottom: 1px solid var(--border); position: sticky; top: 0; z-index: 20; }
     .hd-left { display: flex; align-items: center; gap: 10px; }
-    .hd-logo {
-      width: 36px; height: 36px;
-      background: linear-gradient(135deg, #7C5CBF 0%, #9B7FD4 100%);
-      border-radius: 10px;
-      display: flex; align-items: center; justify-content: center;
-      color: white;
-      font-family: 'DM Sans', sans-serif;
-      font-weight: 500;
-      font-size: 14px;
-      letter-spacing: -0.5px;
-    }
     .hd-name { font-family: 'DM Sans', sans-serif; font-weight: 500; font-size: 17px; color: var(--ink); letter-spacing: -0.3px; }
     .hd-sub { font-size: 11px; color: var(--ink-3); margin-top: 1px; }
     .hd-ver { font-size: 10px; color: var(--ink-3); letter-spacing: 0.02em; font-family: 'DM Sans', sans-serif; }
 
-    /* ── MAIN ── */
-    .main { padding: 20px 16px 80px; }
+    /* TABS */
+    .tabs { display: flex; background: var(--white); border-bottom: 1px solid var(--border); padding: 0 16px; gap: 0; position: sticky; top: 65px; z-index: 19; }
+    .tab-btn { flex: 1; padding: 13px 8px; border: none; background: none; font-size: 13px; font-weight: 500; color: var(--ink-3); font-family: 'Noto Sans KR', sans-serif; cursor: pointer; border-bottom: 2px solid transparent; transition: all 0.2s; white-space: nowrap; }
+    .tab-btn.on { color: var(--p); border-bottom-color: var(--p); }
 
-    /* ── MODE TOGGLE ── */
-    .toggle {
-      display: flex;
-      background: var(--white);
-      border: 1px solid var(--border);
-      border-radius: 100px;
-      padding: 4px;
-      margin-bottom: 16px;
-      gap: 4px;
-    }
-    .tog-btn {
-      flex: 1;
-      padding: 9px 0;
-      border-radius: 100px;
-      border: none;
-      background: none;
-      font-size: 13px;
-      font-weight: 500;
-      color: var(--ink-3);
-      font-family: 'Noto Sans KR', sans-serif;
-      cursor: pointer;
-      transition: all 0.2s;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      gap: 6px;
-    }
-    .tog-btn.on {
-      background: var(--p);
-      color: white;
-      box-shadow: 0 2px 8px rgba(124,92,191,0.3);
-    }
-    .tog-badge {
-      font-size: 9px;
-      font-weight: 600;
-      letter-spacing: 0.06em;
-      padding: 2px 5px;
-      border-radius: 4px;
-      font-family: 'DM Sans', sans-serif;
-    }
+    /* PANELS */
+    .panel { display: none; padding: 20px 16px 80px; }
+    .panel.on { display: block; }
+
+    /* TOGGLE (ES/KR) */
+    .toggle { display: flex; background: var(--white); border: 1px solid var(--border); border-radius: 100px; padding: 4px; margin-bottom: 16px; gap: 4px; }
+    .tog-btn { flex: 1; padding: 9px 0; border-radius: 100px; border: none; background: none; font-size: 13px; font-weight: 500; color: var(--ink-3); font-family: 'Noto Sans KR', sans-serif; cursor: pointer; transition: all 0.2s; display: flex; align-items: center; justify-content: center; gap: 6px; }
+    .tog-btn.on { background: var(--p); color: white; box-shadow: 0 2px 8px rgba(124,92,191,0.3); }
+    .tog-badge { font-size: 9px; font-weight: 600; letter-spacing: 0.06em; padding: 2px 5px; border-radius: 4px; font-family: 'DM Sans', sans-serif; }
     .tog-btn.on .tog-badge { background: rgba(255,255,255,0.2); color: white; }
     .tog-btn:not(.on) .tog-badge { background: var(--p-light); color: var(--p); }
     .tog-arrow { font-size: 14px; color: var(--ink-3); align-self: center; flex-shrink: 0; }
 
-    /* ── INPUT CARD ── */
-    .inp-wrap {
-      background: var(--white);
-      border: 1.5px solid var(--border);
-      border-radius: var(--r);
-      padding: 16px 16px 12px;
-      transition: border-color 0.2s, box-shadow 0.2s;
-      margin-bottom: 12px;
-    }
-    .inp-wrap:focus-within {
-      border-color: var(--p);
-      box-shadow: 0 0 0 4px rgba(124,92,191,0.1);
-    }
-    textarea {
-      width: 100%;
-      min-height: 56px;
-      border: none;
-      outline: none;
-      font-size: 15px;
-      font-family: 'Noto Sans KR', sans-serif;
-      font-weight: 400;
-      color: var(--ink);
-      background: transparent;
-      resize: none;
-      line-height: 1.6;
-      overflow: hidden;
-    }
+    /* INPUT */
+    .inp-wrap { background: var(--white); border: 1.5px solid var(--border); border-radius: var(--r); padding: 16px 16px 12px; transition: border-color 0.2s, box-shadow 0.2s; margin-bottom: 12px; }
+    .inp-wrap:focus-within { border-color: var(--p); box-shadow: 0 0 0 4px rgba(124,92,191,0.1); }
+    textarea { width: 100%; min-height: 56px; border: none; outline: none; font-size: 15px; font-family: 'Noto Sans KR', sans-serif; font-weight: 400; color: var(--ink); background: transparent; resize: none; line-height: 1.6; overflow: hidden; }
     textarea::placeholder { color: var(--ink-3); font-weight: 300; }
-    .inp-foot {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      padding-top: 10px;
-      border-top: 1px solid var(--border);
-      margin-top: 10px;
-    }
+    .inp-foot { display: flex; align-items: center; justify-content: space-between; padding-top: 10px; border-top: 1px solid var(--border); margin-top: 10px; }
     .inp-hint { font-size: 11px; color: var(--ink-3); }
-    .btn-go {
-      padding: 10px 22px;
-      background: var(--p);
-      color: white;
-      border: none;
-      border-radius: 100px;
-      font-size: 13px;
-      font-weight: 500;
-      font-family: 'Noto Sans KR', sans-serif;
-      cursor: pointer;
-      transition: all 0.18s;
-      box-shadow: 0 2px 10px rgba(124,92,191,0.3);
-      display: flex;
-      align-items: center;
-      gap: 6px;
-    }
+    .btn-go { padding: 10px 22px; background: var(--p); color: white; border: none; border-radius: 100px; font-size: 13px; font-weight: 500; font-family: 'Noto Sans KR', sans-serif; cursor: pointer; transition: all 0.18s; box-shadow: 0 2px 10px rgba(124,92,191,0.3); display: flex; align-items: center; gap: 6px; }
     .btn-go:hover { background: #6A4DAD; }
     .btn-go:active { transform: scale(0.97); }
     .btn-go:disabled { background: #DDD; box-shadow: none; cursor: default; }
-    .spin {
-      width: 14px; height: 14px;
-      border: 2px solid rgba(255,255,255,0.3);
-      border-top-color: white;
-      border-radius: 50%;
-      animation: spin 0.7s linear infinite;
-    }
+    .spin { width: 14px; height: 14px; border: 2px solid rgba(255,255,255,0.3); border-top-color: white; border-radius: 50%; animation: spin 0.7s linear infinite; }
     @keyframes spin { to { transform: rotate(360deg); } }
 
-    /* ── RESULTS ── */
+    /* RESULT CARDS */
     .results { display: flex; flex-direction: column; gap: 10px; opacity: 0; transition: opacity 0.3s; }
     .results.show { opacity: 1; }
-
-    .card {
-      background: var(--white);
-      border-radius: var(--r);
-      border: 1px solid var(--border);
-      overflow: hidden;
-    }
-    .card-hd {
-      padding: 12px 16px;
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      font-size: 11px;
-      font-weight: 600;
-      letter-spacing: 0.06em;
-      text-transform: uppercase;
-    }
-    .card-hd-dot {
-      width: 6px; height: 6px;
-      border-radius: 50%;
-      flex-shrink: 0;
-    }
+    .card { background: var(--white); border-radius: var(--r); border: 1px solid var(--border); overflow: hidden; }
+    .card-hd { padding: 12px 16px; display: flex; align-items: center; gap: 8px; font-size: 11px; font-weight: 600; letter-spacing: 0.06em; text-transform: uppercase; }
+    .card-hd-dot { width: 6px; height: 6px; border-radius: 50%; flex-shrink: 0; }
     .card-bd { padding: 14px 16px; font-size: 14px; line-height: 1.75; color: var(--ink); }
-
     .c-trans .card-hd { background: var(--p-light); color: var(--p); }
     .c-trans .card-hd-dot { background: var(--p); }
     .c-corr .card-hd { background: var(--green-bg); color: var(--green); }
@@ -219,23 +77,13 @@
     .c-ex .card-hd-dot { background: var(--blue); }
     .c-gram .card-hd { background: var(--amber-bg); color: var(--amber); }
     .c-gram .card-hd-dot { background: var(--amber); }
-
     .ph { color: var(--ink-3); font-size: 13px; font-style: italic; }
     .err { color: var(--red); font-size: 13px; }
 
-    /* ── CORRECTION ── */
+    /* CORRECTION */
     .ok-line { display: flex; align-items: center; gap: 8px; color: var(--green); font-weight: 500; font-size: 14px; }
     .ok-icon { width: 20px; height: 20px; background: var(--green); border-radius: 50%; display: flex; align-items: center; justify-content: center; color: white; font-size: 11px; flex-shrink: 0; }
-    .corr-chip {
-      display: inline-block;
-      font-size: 10px;
-      font-weight: 600;
-      letter-spacing: 0.05em;
-      text-transform: uppercase;
-      padding: 3px 8px;
-      border-radius: 6px;
-      margin-bottom: 4px;
-    }
+    .corr-chip { display: inline-block; font-size: 10px; font-weight: 600; letter-spacing: 0.05em; text-transform: uppercase; padding: 3px 8px; border-radius: 6px; margin-bottom: 4px; }
     .chip-orig { background: #F0EAF9; color: #6A4DAD; }
     .chip-err { background: var(--red-bg); color: var(--red); }
     .chip-fix { background: var(--green-bg); color: var(--green); }
@@ -245,187 +93,190 @@
     .corr-sep { border: none; border-top: 1px solid var(--border); margin: 10px 0; }
     .corr-final { font-weight: 500; }
 
-    /* ── EXAMPLES ── */
+    /* EXAMPLES */
     .ex-item { padding: 10px 0; border-bottom: 1px solid var(--border); }
     .ex-item:last-child { border-bottom: none; padding-bottom: 0; }
     .ex-item:first-child { padding-top: 0; }
     .ex-es { font-size: 14px; font-weight: 500; color: var(--ink); }
     .ex-ko { font-size: 12px; color: var(--ink-2); margin-top: 3px; }
 
-    /* ── GRAMMAR ── */
-    .gram-sec { font-size: 10px; font-weight: 600; letter-spacing: 0.07em; text-transform: uppercase; color: var(--ink-3); margin: 12px 0 6px; }
-    .gram-sec:first-child { margin-top: 0; }
-    .verb-pill {
-      display: inline-flex;
-      align-items: center;
-      gap: 6px;
-      background: var(--amber-bg);
-      border: 1px solid rgba(138,90,0,0.12);
-      padding: 5px 12px;
-      border-radius: 100px;
-      margin-bottom: 8px;
-    }
+    /* GRAMMAR */
+    .gram-sec-title { font-size: 10px; font-weight: 600; letter-spacing: 0.07em; text-transform: uppercase; color: var(--ink-3); margin: 14px 0 8px; }
+    .gram-sec-title:first-child { margin-top: 0; }
+    .gram-analysis { background: #FAFAFA; border: 1px solid var(--border); border-radius: var(--r-sm); padding: 12px 14px; margin-bottom: 4px; }
+    .gram-analysis-item { display: flex; gap: 10px; padding: 6px 0; border-bottom: 1px solid var(--border); font-size: 13px; }
+    .gram-analysis-item:last-child { border-bottom: none; padding-bottom: 0; }
+    .gram-tag { font-size: 10px; font-weight: 600; letter-spacing: 0.04em; padding: 2px 7px; border-radius: 5px; background: var(--amber-bg); color: var(--amber); white-space: nowrap; align-self: flex-start; margin-top: 1px; flex-shrink: 0; }
+    .gram-desc { color: var(--ink-2); line-height: 1.6; }
+    .verb-pill { display: inline-flex; align-items: center; gap: 6px; background: var(--amber-bg); border: 1px solid rgba(138,90,0,0.12); padding: 5px 12px; border-radius: 100px; margin-bottom: 8px; }
     .verb-name { font-family: 'DM Sans', sans-serif; font-weight: 500; font-size: 15px; color: var(--amber); }
     .verb-mean { font-size: 12px; color: var(--ink-2); }
     .gram-exp { font-size: 13px; line-height: 1.7; color: var(--ink-2); margin-bottom: 10px; }
     .conj-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 5px; margin-bottom: 12px; }
-    .conj-cell {
-      background: #FAFAFA;
-      border: 1px solid var(--border);
-      border-radius: var(--r-xs);
-      padding: 7px 10px;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-    }
+    .conj-cell { background: #FAFAFA; border: 1px solid var(--border); border-radius: var(--r-xs); padding: 7px 10px; display: flex; justify-content: space-between; align-items: center; }
     .conj-pro { font-size: 11px; color: var(--ink-3); }
     .conj-form { font-size: 13px; font-weight: 500; color: var(--p); font-family: 'DM Sans', sans-serif; }
-    .c-conj .card-hd { background: #EDF9F0; color: #1A6B40; }
-    .c-conj .card-hd-dot { background: #1A6B40; }
-    .conj-input-row { display: flex; gap: 8px; }
-    .conj-input-row input {
-      flex: 1; padding: 10px 14px; border: 1.5px solid var(--border);
-      border-radius: 100px; font-size: 14px; font-family: 'Noto Sans KR', sans-serif;
-      outline: none; color: var(--ink); background: var(--surface);
-      transition: border-color 0.2s;
-    }
-    .conj-input-row input:focus { border-color: var(--p); }
-    .btn-conj {
-      padding: 10px 18px; background: #1A6B40; color: white;
-      border: none; border-radius: 100px; font-size: 13px; font-weight: 500;
-      font-family: 'Noto Sans KR', sans-serif; cursor: pointer; white-space: nowrap;
-      transition: all 0.18s; flex-shrink: 0;
-    }
-    .btn-conj:hover { background: #155733; }
-    .btn-conj:disabled { background: #ccc; cursor: default; }
-    .conj-result { margin-top: 16px; }
-    .conj-verb-hd { margin-bottom: 14px; padding-bottom: 12px; border-bottom: 1px solid var(--border); }
-    .conj-verb-name { font-family: 'DM Sans', sans-serif; font-size: 22px; font-weight: 500; color: var(--ink); }
-    .conj-verb-type { font-size: 12px; color: var(--ink-3); margin-top: 2px; }
-    .conj-verb-mean { font-size: 14px; color: var(--ink-2); margin-top: 4px; }
-    .tense-section { margin-bottom: 18px; }
-    .tense-title {
-      font-size: 11px; font-weight: 600; letter-spacing: 0.07em; text-transform: uppercase;
-      color: white; background: #1A6B40; padding: 5px 12px; border-radius: 6px;
-      display: inline-block; margin-bottom: 10px;
-    }
-    .tense-table { width: 100%; border-collapse: collapse; }
-    .tense-table tr { border-bottom: 1px solid var(--border); }
-    .tense-table tr:last-child { border-bottom: none; }
-    .tense-table td { padding: 8px 4px; font-size: 13px; }
-    .tense-table .pro { color: var(--ink-3); width: 35%; }
-    .tense-table .form { font-weight: 500; color: var(--ink); font-family: 'DM Sans', sans-serif; }
-    .tense-table .meaning { color: var(--ink-2); font-size: 12px; text-align: right; }
-    .tense-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 0 12px; }
-    .gram-note {
-      background: linear-gradient(135deg, #F3EEFF 0%, #EDF4FF 100%);
-      border-radius: var(--r-sm);
-      padding: 12px 14px;
-      font-size: 13px;
-      line-height: 1.7;
-      color: var(--ink-2);
-      border: 1px solid rgba(124,92,191,0.1);
-    }
+    .gram-note { background: linear-gradient(135deg, #F3EEFF 0%, #EDF4FF 100%); border-radius: var(--r-sm); padding: 12px 14px; font-size: 13px; line-height: 1.7; color: var(--ink-2); border: 1px solid rgba(124,92,191,0.1); }
+
+    /* CONJUGATION TAB */
+    .conj-tab-wrap { background: var(--white); border: 1.5px solid var(--border); border-radius: var(--r); padding: 16px; margin-bottom: 12px; }
+    .conj-tab-wrap:focus-within { border-color: var(--teal); box-shadow: 0 0 0 4px rgba(26,107,90,0.08); }
+    .conj-row { display: flex; gap: 8px; }
+    .conj-row input { flex: 1; padding: 11px 14px; border: 1.5px solid var(--border); border-radius: 100px; font-size: 14px; font-family: 'Noto Sans KR', sans-serif; outline: none; color: var(--ink); background: var(--surface); transition: border-color 0.2s; }
+    .conj-row input:focus { border-color: var(--teal); }
+    .btn-conj { padding: 11px 20px; background: var(--teal); color: white; border: none; border-radius: 100px; font-size: 13px; font-weight: 500; font-family: 'Noto Sans KR', sans-serif; cursor: pointer; transition: all 0.18s; box-shadow: 0 2px 10px rgba(26,107,90,0.25); white-space: nowrap; }
+    .btn-conj:hover { background: #155a4a; }
+    .btn-conj:disabled { background: #ccc; box-shadow: none; cursor: default; }
+    .conj-hint { font-size: 11px; color: var(--ink-3); margin-top: 10px; }
+
+    .conj-result-card { background: var(--white); border-radius: var(--r); border: 1px solid var(--border); overflow: hidden; }
+    .conj-result-hd { padding: 16px 16px 12px; border-bottom: 1px solid var(--border); }
+    .conj-verb-title { font-family: 'DM Sans', sans-serif; font-size: 24px; font-weight: 500; color: var(--ink); }
+    .conj-verb-sub { font-size: 12px; color: var(--ink-3); margin-top: 3px; }
+    .conj-verb-mean-badge { display: inline-block; margin-top: 8px; background: var(--teal-bg); color: var(--teal); font-size: 13px; font-weight: 500; padding: 4px 12px; border-radius: 100px; }
+
+    .tense-block { border-bottom: 1px solid var(--border); }
+    .tense-block:last-child { border-bottom: none; }
+    .tense-hd { padding: 12px 16px 8px; display: flex; align-items: center; gap: 8px; }
+    .tense-badge { font-size: 10px; font-weight: 600; letter-spacing: 0.05em; text-transform: uppercase; padding: 3px 10px; border-radius: 100px; background: var(--teal); color: white; }
+    .tense-name-ko { font-size: 12px; color: var(--ink-3); }
+    .tense-rows { padding: 0 16px 12px; display: grid; grid-template-columns: 1fr 1fr; gap: 4px 12px; }
+    .tense-row { display: flex; justify-content: space-between; align-items: center; padding: 6px 8px; background: #FAFAFA; border-radius: var(--r-xs); border: 1px solid var(--border); }
+    .tense-pro { font-size: 11px; color: var(--ink-3); }
+    .tense-form { font-size: 13px; font-weight: 500; color: var(--teal); font-family: 'DM Sans', sans-serif; }
   </style>
 </head>
 <body>
 
 <header class="hd">
   <div class="hd-left">
-    <div class="hd-logo">jO</div>
     <div>
       <div class="hd-name">jOYA</div>
       <div class="hd-sub">스페인어 번역기</div>
     </div>
   </div>
-  <span class="hd-ver">v1.0 · 20260510</span>
+  <span class="hd-ver">v1.0 &middot; 20260510</span>
 </header>
 
-<main class="main">
+<nav class="tabs">
+  <button class="tab-btn on" id="tab-es" onclick="switchTab('es')">&#127466;&#127480; 스페인어</button>
+  <button class="tab-btn" id="tab-ko" onclick="switchTab('ko')">&#127472;&#127479; 한국어</button>
+  <button class="tab-btn" id="tab-conj" onclick="switchTab('conj')">&#128290; 동사 변환표</button>
+</nav>
 
-  <div class="toggle">
-    <button class="tog-btn on" id="btn-es" onclick="setMode('es')">
-      <span class="tog-badge">ES</span> 스페인어
-    </button>
-    <span class="tog-arrow">&#8644;</span>
-    <button class="tog-btn" id="btn-ko" onclick="setMode('ko')">
-      <span class="tog-badge">KR</span> 한국어
-    </button>
-  </div>
-
+<!-- TAB: 스페인어 번역 -->
+<div class="panel on" id="panel-es">
   <div class="inp-wrap">
-    <textarea id="ta" placeholder="스페인어 문장을 입력하세요" rows="2"></textarea>
+    <textarea id="ta-es" placeholder="스페인어 문장을 입력하세요" rows="2"></textarea>
     <div class="inp-foot">
       <span class="inp-hint">Enter 번역 &middot; Shift+Enter 줄바꿈</span>
-      <button class="btn-go" id="btn-go" onclick="doTranslate()">번역</button>
+      <button class="btn-go" id="btn-es" onclick="doTranslate('es')">번역</button>
     </div>
   </div>
-
-  <div class="results" id="results">
+  <div class="results" id="results-es">
     <div class="card c-trans">
       <div class="card-hd"><span class="card-hd-dot"></span>해석</div>
-      <div class="card-bd" id="r-trans"><span class="ph">번역 결과가 여기 표시됩니다</span></div>
+      <div class="card-bd" id="r-trans-es"><span class="ph">번역 결과가 여기 표시됩니다</span></div>
     </div>
     <div class="card c-corr">
       <div class="card-hd"><span class="card-hd-dot"></span>문장 교정</div>
-      <div class="card-bd" id="r-corr"><span class="ph">교정 내용이 여기 표시됩니다</span></div>
+      <div class="card-bd" id="r-corr-es"><span class="ph">교정 내용이 여기 표시됩니다</span></div>
     </div>
     <div class="card c-ex">
-      <div class="card-hd"><span class="card-hd-dot"></span>예제</div>
-      <div class="card-bd" id="r-ex"><span class="ph">관련 예제 문장이 여기 표시됩니다</span></div>
+      <div class="card-hd"><span class="card-hd-dot"></span>비슷한 예제</div>
+      <div class="card-bd" id="r-ex-es"><span class="ph">관련 예제 문장이 여기 표시됩니다</span></div>
     </div>
     <div class="card c-gram">
-      <div class="card-hd"><span class="card-hd-dot"></span>문법 &amp; 동사 변환</div>
-      <div class="card-bd" id="r-gram"><span class="ph">동사 변환 및 문법 설명이 여기 표시됩니다</span></div>
-    </div>
-    <div class="card c-conj">
-      <div class="card-hd"><span class="card-hd-dot"></span>스페인어 동사 변환표</div>
-      <div class="card-bd" id="r-conj">
-        <div class="conj-input-row">
-          <input type="text" id="conj-input" placeholder="동사 입력 (예: comer, hablar)" />
-          <button class="btn-conj" id="btn-conj" onclick="doConjugate()">변환</button>
-        </div>
-      </div>
+      <div class="card-hd"><span class="card-hd-dot"></span>문법 분석 &amp; 동사 변환</div>
+      <div class="card-bd" id="r-gram-es"><span class="ph">문법 설명이 여기 표시됩니다</span></div>
     </div>
   </div>
+</div>
 
-</main>
+<!-- TAB: 한국어 번역 -->
+<div class="panel" id="panel-ko">
+  <div class="inp-wrap">
+    <textarea id="ta-ko" placeholder="한국어 문장을 입력하세요" rows="2"></textarea>
+    <div class="inp-foot">
+      <span class="inp-hint">Enter 번역 &middot; Shift+Enter 줄바꿈</span>
+      <button class="btn-go" id="btn-ko" onclick="doTranslate('ko')">번역</button>
+    </div>
+  </div>
+  <div class="results" id="results-ko">
+    <div class="card c-trans">
+      <div class="card-hd"><span class="card-hd-dot"></span>스페인어 번역</div>
+      <div class="card-bd" id="r-trans-ko"><span class="ph">번역 결과가 여기 표시됩니다</span></div>
+    </div>
+    <div class="card c-ex">
+      <div class="card-hd"><span class="card-hd-dot"></span>비슷한 예제</div>
+      <div class="card-bd" id="r-ex-ko"><span class="ph">관련 예제 문장이 여기 표시됩니다</span></div>
+    </div>
+    <div class="card c-gram">
+      <div class="card-hd"><span class="card-hd-dot"></span>문법 분석 &amp; 동사 변환</div>
+      <div class="card-bd" id="r-gram-ko"><span class="ph">문법 설명이 여기 표시됩니다</span></div>
+    </div>
+  </div>
+</div>
+
+<!-- TAB: 동사 변환표 -->
+<div class="panel" id="panel-conj">
+  <div class="conj-tab-wrap">
+    <div class="conj-row">
+      <input type="text" id="conj-input" placeholder="동사 원형 입력 (예: comer, hablar, ser)" />
+      <button class="btn-conj" id="btn-conj" onclick="doConjugate()">변환</button>
+    </div>
+    <p class="conj-hint">스페인어 동사 원형을 입력하면 7가지 시제별 변환표를 보여드려요</p>
+  </div>
+  <div id="conj-result"></div>
+</div>
 
 <script>
-var mode = 'es';
-var ta = document.getElementById('ta');
+var activeTab = 'es';
 
-ta.addEventListener('input', function() {
-  ta.style.height = 'auto';
-  ta.style.height = ta.scrollHeight + 'px';
-});
-
-function setMode(m) {
-  mode = m;
-  document.getElementById('btn-es').classList.toggle('on', m === 'es');
-  document.getElementById('btn-ko').classList.toggle('on', m === 'ko');
-  ta.placeholder = m === 'es' ? '스페인어 문장을 입력하세요' : '한국어 문장을 입력하세요';
+function switchTab(t) {
+  activeTab = t;
+  ['es','ko','conj'].forEach(function(id) {
+    document.getElementById('tab-' + id).classList.toggle('on', id === t);
+    document.getElementById('panel-' + id).classList.toggle('on', id === t);
+  });
 }
 
-function setLoading(on) {
-  var b = document.getElementById('btn-go');
-  b.disabled = on;
-  b.innerHTML = on ? '<div class="spin"></div>' : '번역';
+// Auto-resize textareas
+['ta-es','ta-ko'].forEach(function(id) {
+  var el = document.getElementById(id);
+  el.addEventListener('input', function() {
+    el.style.height = 'auto';
+    el.style.height = el.scrollHeight + 'px';
+  });
+  el.addEventListener('keydown', function(e) {
+    if (e.key === 'Enter' && !e.shiftKey) {
+      e.preventDefault();
+      doTranslate(id === 'ta-es' ? 'es' : 'ko');
+    }
+  });
+});
+
+document.getElementById('conj-input').addEventListener('keydown', function(e) {
+  if (e.key === 'Enter') doConjugate();
+});
+
+function setLoading(mode, on) {
+  var btn = document.getElementById('btn-' + mode);
+  btn.disabled = on;
+  btn.innerHTML = on ? '<div class="spin"></div>' : '번역';
 }
 
 function setText(id, t) { document.getElementById(id).textContent = t; }
 
-function renderCorr(c) {
-  var el = document.getElementById('r-corr');
+function renderCorr(c, suffix) {
+  var el = document.getElementById('r-corr-' + suffix);
+  if (!el) return;
   if (!c || (c.errors && c.errors.length === 0)) {
     el.innerHTML = '<div class="ok-line"><div class="ok-icon">&#10003;</div>자연스러운 문장입니다</div>';
     return;
   }
-  if (typeof c === 'string') { el.textContent = c; return; }
   var h = '';
-  if (c.original) {
-    h += '<div><span class="corr-chip chip-orig">원문</span><div class="corr-val">' + c.original + '</div></div>';
-  }
+  if (c.original) h += '<div><span class="corr-chip chip-orig">원문</span><div class="corr-val">' + c.original + '</div></div>';
   if (c.errors && c.errors.length) {
     for (var i = 0; i < c.errors.length; i++) {
       var e = c.errors[i];
@@ -435,14 +286,12 @@ function renderCorr(c) {
       h += '<span class="corr-chip chip-desc">설명</span><div class="corr-val">' + e.desc + '</div></div>';
     }
   }
-  if (c.result) {
-    h += '<hr class="corr-sep"><div><span class="corr-chip chip-result">최종 교정문</span><div class="corr-val corr-final">' + c.result + '</div></div>';
-  }
+  if (c.result) h += '<hr class="corr-sep"><div><span class="corr-chip chip-result">최종 교정문</span><div class="corr-val corr-final">' + c.result + '</div></div>';
   el.innerHTML = h;
 }
 
-function renderEx(arr) {
-  var el = document.getElementById('r-ex');
+function renderEx(arr, suffix) {
+  var el = document.getElementById('r-ex-' + suffix);
   if (!arr || !arr.length) { el.innerHTML = '<span class="ph">예제 없음</span>'; return; }
   var h = '';
   for (var i = 0; i < arr.length; i++) {
@@ -451,13 +300,21 @@ function renderEx(arr) {
   el.innerHTML = h;
 }
 
-function renderGram(d) {
-  var el = document.getElementById('r-gram');
+function renderGram(d, suffix) {
+  var el = document.getElementById('r-gram-' + suffix);
   var h = '';
+  if (d && d.analysis && d.analysis.length) {
+    h += '<p class="gram-sec-title">문법 분석</p><div class="gram-analysis">';
+    for (var i = 0; i < d.analysis.length; i++) {
+      var a = d.analysis[i];
+      h += '<div class="gram-analysis-item"><span class="gram-tag">' + a.tag + '</span><span class="gram-desc">' + a.desc + '</span></div>';
+    }
+    h += '</div>';
+  }
   if (d && d.verbs && d.verbs.length) {
+    h += '<p class="gram-sec-title">동사 변환</p>';
     for (var i = 0; i < d.verbs.length; i++) {
       var v = d.verbs[i];
-      h += '<p class="gram-sec">동사</p>';
       h += '<div class="verb-pill"><span class="verb-name">' + v.infinitive + '</span><span class="verb-mean">' + v.meaning + '</span></div>';
       h += '<p class="gram-exp">' + v.explanation + '</p>';
       if (v.conjugations && v.conjugations.length) {
@@ -470,30 +327,52 @@ function renderGram(d) {
     }
   }
   if (d && d.notes) {
-    h += '<p class="gram-sec">문법 노트</p><div class="gram-note">' + d.notes + '</div>';
+    h += '<p class="gram-sec-title">문법 노트</p><div class="gram-note">' + d.notes + '</div>';
   }
-  el.innerHTML = h || '<span class="ph">동사 정보 없음</span>';
+  el.innerHTML = h || '<span class="ph">문법 정보 없음</span>';
 }
 
 function getPrompt(isES, text) {
-  var rule = 'STRICT: All Korean fields must use ONLY Korean Hangul. NO Chinese characters (漢字), NO Japanese, NO mixed scripts. Write 시청 not 市廳.\n\n';
-  var json = '{"translation":"번역","correction":{"original":"원문","errors":[{"error":"오류(한국어)","fix":"수정","desc":"설명(한국어)"}],"result":"교정문"},"examples":[{"es":"예문","ko":"번역"},{"es":"예문2","ko":"번역2"},{"es":"예문3","ko":"번역3"}],"grammar":{"verbs":[{"infinitive":"원형","meaning":"뜻","explanation":"설명(한국어)","conjugations":[{"pronoun":"yo","form":""},{"pronoun":"tú","form":""},{"pronoun":"él/ella","form":""},{"pronoun":"nosotros","form":""},{"pronoun":"vosotros","form":""},{"pronoun":"ellos","form":""}]}],"notes":"노트(한국어)"}}';
+  var rule = 'STRICT: All Korean fields must use ONLY Korean Hangul. NO Chinese characters, NO Japanese. Write 시청 not 市廳.\n\n';
   if (isES) {
-    return rule + 'Spanish tutor for Korean learners. Respond ONLY with valid JSON, no markdown.\nUser inputs Spanish. Return: ' + json + '\nInput: ' + text;
+    return rule + 'You are a Spanish tutor for Korean learners. Respond ONLY with valid JSON, no markdown.\n' +
+      'User inputs a Spanish sentence.\n' +
+      'For "examples": provide 3 SPANISH example sentences similar in topic/grammar to the input. The "es" field is the Spanish sentence, "ko" is its Korean translation.\n' +
+      'For "grammar": first provide "analysis" array with grammar breakdown of the input sentence (주어/동사/목적어/시제 등), then "verbs" array with conjugation.\n' +
+      'Return:\n' +
+      '{"translation":"한국어 번역","correction":{"original":"원문","errors":[{"error":"오류(한국어)","fix":"수정","desc":"설명"}],"result":"교정문"},' +
+      '"examples":[{"es":"비슷한 스페인어 예문1","ko":"한국어 번역"},{"es":"예문2","ko":"번역"},{"es":"예문3","ko":"번역"}],' +
+      '"grammar":{"analysis":[{"tag":"주어","desc":"설명(한국어)"},{"tag":"동사","desc":"설명"},{"tag":"시제","desc":"설명"}],' +
+      '"verbs":[{"infinitive":"원형","meaning":"뜻","explanation":"시제 설명(한국어)",' +
+      '"conjugations":[{"pronoun":"yo","form":""},{"pronoun":"tú","form":""},{"pronoun":"él/ella","form":""},{"pronoun":"nosotros","form":""},{"pronoun":"vosotros","form":""},{"pronoun":"ellos","form":""}]}],' +
+      '"notes":"문법 노트(한국어)"}}\n\nInput: ' + text;
   } else {
-    return rule + 'Spanish tutor for Korean learners. Respond ONLY with valid JSON, no markdown.\nTranslate Korean to Spanish. Do NOT correct Korean. Set errors:[]. Return: ' + json + '\nInput: ' + text;
+    return rule + 'You are a Spanish tutor for Korean learners. Respond ONLY with valid JSON, no markdown.\n' +
+      'User inputs a Korean sentence. Translate to Spanish. Do NOT correct Korean.\n' +
+      'For "examples": provide 3 SPANISH example sentences similar in topic to the input. The "es" field is Spanish, "ko" is Korean translation.\n' +
+      'For "grammar": analyze the SPANISH translation grammar.\n' +
+      'Return:\n' +
+      '{"translation":"Spanish translation","correction":{"original":"원문","errors":[],"result":"원문 그대로"},' +
+      '"examples":[{"es":"비슷한 스페인어 예문1","ko":"한국어 번역"},{"es":"예문2","ko":"번역"},{"es":"예문3","ko":"번역"}],' +
+      '"grammar":{"analysis":[{"tag":"주어","desc":"설명(한국어)"},{"tag":"동사","desc":"설명"},{"tag":"시제","desc":"설명"}],' +
+      '"verbs":[{"infinitive":"원형","meaning":"뜻","explanation":"시제 설명(한국어)",' +
+      '"conjugations":[{"pronoun":"yo","form":""},{"pronoun":"tú","form":""},{"pronoun":"él/ella","form":""},{"pronoun":"nosotros","form":""},{"pronoun":"vosotros","form":""},{"pronoun":"ellos","form":""}]}],' +
+      '"notes":"문법 노트(한국어)"}}\n\nInput: ' + text;
   }
 }
 
-async function doTranslate() {
+async function doTranslate(mode) {
+  var ta = document.getElementById('ta-' + mode);
   var raw = ta.value.trim();
   if (!raw) return;
-  setLoading(true);
-  document.getElementById('results').classList.add('show');
-  setText('r-trans', '분석 중...');
-  document.getElementById('r-corr').innerHTML = '<span class="ph">분석 중...</span>';
-  document.getElementById('r-ex').innerHTML = '<span class="ph">로딩 중...</span>';
-  document.getElementById('r-gram').innerHTML = '<span class="ph">로딩 중...</span>';
+  setLoading(mode, true);
+  document.getElementById('results-' + mode).classList.add('show');
+  setText('r-trans-' + mode, '분석 중...');
+  if (mode === 'es') {
+    document.getElementById('r-corr-es').innerHTML = '<span class="ph">분석 중...</span>';
+  }
+  document.getElementById('r-ex-' + mode).innerHTML = '<span class="ph">로딩 중...</span>';
+  document.getElementById('r-gram-' + mode).innerHTML = '<span class="ph">로딩 중...</span>';
 
   try {
     var resp = await fetch('/.netlify/functions/translate', {
@@ -510,55 +389,40 @@ async function doTranslate() {
     txt = txt.replace(/[\x00-\x08\x0B\x0C\x0E-\x1F\x7F]/g, '');
     var p = JSON.parse(txt);
 
-    setText('r-trans', p.translation || '-');
-    renderCorr(p.correction);
-    renderEx(p.examples || []);
-    renderGram(p.grammar || {});
+    setText('r-trans-' + mode, p.translation || '-');
+    if (mode === 'es') renderCorr(p.correction, 'es');
+    renderEx(p.examples || [], mode);
+    renderGram(p.grammar || {}, mode);
   } catch(err) {
-    setText('r-trans', '오류: ' + err.message);
-    document.getElementById('r-corr').innerHTML = '<span class="err">결과를 불러올 수 없습니다</span>';
-    document.getElementById('r-ex').innerHTML = '<span class="err">결과를 불러올 수 없습니다</span>';
-    document.getElementById('r-gram').innerHTML = '<span class="err">결과를 불러올 수 없습니다</span>';
+    setText('r-trans-' + mode, '오류: ' + err.message);
+    if (mode === 'es') document.getElementById('r-corr-es').innerHTML = '<span class="err">오류 발생</span>';
+    document.getElementById('r-ex-' + mode).innerHTML = '<span class="err">결과를 불러올 수 없습니다</span>';
+    document.getElementById('r-gram-' + mode).innerHTML = '<span class="err">결과를 불러올 수 없습니다</span>';
   } finally {
-    setLoading(false);
+    setLoading(mode, false);
   }
 }
-
-ta.addEventListener('keydown', function(e) {
-  if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); doTranslate(); }
-});
-
-document.addEventListener('keydown', function(e) {
-  if (e.target.id === 'conj-input' && e.key === 'Enter') doConjugate();
-});
 
 async function doConjugate() {
   var verb = document.getElementById('conj-input').value.trim();
   if (!verb) return;
   var btn = document.getElementById('btn-conj');
-  btn.disabled = true;
-  btn.textContent = '....';
-  var el = document.getElementById('r-conj');
+  btn.disabled = true; btn.textContent = '...';
+  document.getElementById('conj-result').innerHTML = '';
 
-  var prompt = 'STRICT: All Korean must be pure Hangul only. NO Chinese/Japanese characters.\n' +
-    'You are a Spanish conjugation expert. The user inputs a Spanish verb infinitive.\n' +
-    'Respond ONLY with valid JSON, no markdown.\n' +
-    'Return this exact structure:\n' +
-    '{"verb":"infinitive","meaning":"한국어 뜻","verb_type":"규칙/불규칙 동사 (예: -ar 규칙동사)","tenses":[{' +
-    '"name":"현재형 (Presente)","rows":[{' +
-    '"pronoun":"yo","form":"conjugated","meaning":"나는 ~한다"},' +
-    '{"pronoun":"tú","form":"","meaning":""},' +
-    '{"pronoun":"él/ella","form":"","meaning":""},' +
-    '{"pronoun":"nosotros","form":"","meaning":""},' +
-    '{"pronoun":"vosotros","form":"","meaning":""},' +
-    '{"pronoun":"ellos","form":"","meaning":""}]},' +
-    '{"name":"단순과거 (Pretérito Indefinido)","rows":[same structure]},' +
-    '{"name":"불완전과거 (Pretérito Imperfecto)","rows":[same structure]},' +
-    '{"name":"미래형 (Futuro Simple)","rows":[same structure]},' +
-    '{"name":"조건법 (Condicional)","rows":[same structure]},' +
-    '{"name":"현재완료 (Pretérito Perfecto)","rows":[same structure]},' +
-    '{"name":"현재 접속법 (Subjuntivo Presente)","rows":[same structure]}]}' +
-    '\n\nVerb: ' + verb;
+  var prompt = 'STRICT: All Korean must be pure Hangul only.\n' +
+    'You are a Spanish conjugation expert. Respond ONLY with valid JSON, no markdown.\n' +
+    'User inputs a Spanish verb infinitive. Return:\n' +
+    '{"verb":"infinitive","meaning":"한국어 뜻","verb_type":"동사 유형(한국어, 예: -er 규칙동사)",' +
+    '"tenses":[' +
+    '{"tense":"Presente","name_ko":"현재형","rows":[{"pronoun":"yo","form":""},{"pronoun":"tú","form":""},{"pronoun":"él/ella","form":""},{"pronoun":"nosotros","form":""},{"pronoun":"vosotros","form":""},{"pronoun":"ellos","form":""}]},' +
+    '{"tense":"Pretérito Indefinido","name_ko":"단순과거","rows":[같은 구조]},' +
+    '{"tense":"Pretérito Imperfecto","name_ko":"불완전과거","rows":[같은 구조]},' +
+    '{"tense":"Futuro Simple","name_ko":"단순미래","rows":[같은 구조]},' +
+    '{"tense":"Condicional","name_ko":"조건법","rows":[같은 구조]},' +
+    '{"tense":"Pretérito Perfecto","name_ko":"현재완료","rows":[같은 구조]},' +
+    '{"tense":"Subjuntivo Presente","name_ko":"현재 접속법","rows":[같은 구조]}' +
+    ']}\n\nVerb: ' + verb;
 
   try {
     var resp = await fetch('/.netlify/functions/translate', {
@@ -570,48 +434,34 @@ async function doConjugate() {
     if (data.error) throw new Error(data.error);
 
     var txt = data.content.map(function(b) { return b.text || ''; }).join('');
-    var s = txt.indexOf('{'), en = txt.lastIndexOf('}');
-    if (s !== -1 && en !== -1) txt = txt.substring(s, en + 1);
+    var s = txt.indexOf('{'), e = txt.lastIndexOf('}');
+    if (s !== -1 && e !== -1) txt = txt.substring(s, e + 1);
     txt = txt.replace(/[\x00-\x08\x0B\x0C\x0E-\x1F\x7F]/g, '');
     var p = JSON.parse(txt);
 
-    var h = '<div class="conj-input-row"><input type="text" id="conj-input" placeholder="동사 입력 (예: comer, hablar)" value="' + verb + '" /><button class="btn-conj" id="btn-conj" onclick="doConjugate()">변환</button></div>';
-    h += '<div class="conj-result">';
-    h += '<div class="conj-verb-hd">';
-    h += '<div class="conj-verb-name">' + p.verb + '</div>';
-    h += '<div class="conj-verb-type">' + p.verb_type + '</div>';
-    h += '<div class="conj-verb-mean">' + p.meaning + '</div>';
+    var h = '<div class="conj-result-card">';
+    h += '<div class="conj-result-hd">';
+    h += '<div class="conj-verb-title">' + p.verb + '</div>';
+    h += '<div class="conj-verb-sub">' + p.verb_type + '</div>';
+    h += '<div class="conj-verb-mean-badge">' + p.meaning + '</div>';
     h += '</div>';
 
     for (var i = 0; i < p.tenses.length; i++) {
       var t = p.tenses[i];
-      h += '<div class="tense-section">';
-      h += '<div class="tense-title">' + t.name + '</div>';
-      h += '<div class="tense-grid">';
+      h += '<div class="tense-block">';
+      h += '<div class="tense-hd"><span class="tense-badge">' + t.tense + '</span><span class="tense-name-ko">' + t.name_ko + '</span></div>';
+      h += '<div class="tense-rows">';
       for (var j = 0; j < t.rows.length; j++) {
-        var r = t.rows[j];
-        h += '<table class="tense-table"><tr>';
-        h += '<td class="pro">' + r.pronoun + '</td>';
-        h += '<td class="form">' + r.form + '</td>';
-        h += '<td class="meaning">' + r.meaning + '</td>';
-        h += '</tr></table>';
+        h += '<div class="tense-row"><span class="tense-pro">' + t.rows[j].pronoun + '</span><span class="tense-form">' + t.rows[j].form + '</span></div>';
       }
       h += '</div></div>';
     }
     h += '</div>';
-    el.innerHTML = h;
-
-    document.getElementById('btn-conj').addEventListener('click', doConjugate);
-    document.getElementById('conj-input').addEventListener('keydown', function(e) {
-      if (e.key === 'Enter') doConjugate();
-    });
-
+    document.getElementById('conj-result').innerHTML = h;
   } catch(err) {
-    el.innerHTML = '<div class="conj-input-row"><input type="text" id="conj-input" placeholder="동사 입력 (예: comer, hablar)" value="' + verb + '" /><button class="btn-conj" id="btn-conj" onclick="doConjugate()">변환</button></div><p style="color:var(--red);font-size:13px;margin-top:12px">오류: ' + err.message + '</p>';
-    document.getElementById('btn-conj').addEventListener('click', doConjugate);
+    document.getElementById('conj-result').innerHTML = '<p style="color:var(--red);font-size:13px;padding:12px 0">오류: ' + err.message + '</p>';
   }
-  var newBtn = document.getElementById('btn-conj');
-  if (newBtn) { newBtn.disabled = false; newBtn.textContent = '변환'; }
+  btn.disabled = false; btn.textContent = '변환';
 }
 </script>
 </body>
