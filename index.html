@@ -165,7 +165,7 @@
     <div class="inp-foot">
       <div class="inp-foot-left">
         <span class="inp-hint">Enter 번역 &middot; Shift+Enter 줄바꿈</span>
-        <span class="limit-msg" id="limit-es">최대 10줄까지 입력 가능해요</span>
+        <span class="limit-msg" id="limit-es">최대 5줄까지 입력 가능해요</span>
       </div>
       <button class="btn-go" id="btn-es" onclick="doTranslate('es')">번역</button>
     </div>
@@ -185,7 +185,7 @@
     <div class="inp-foot">
       <div class="inp-foot-left">
         <span class="inp-hint">Enter 번역 &middot; Shift+Enter 줄바꿈</span>
-        <span class="limit-msg" id="limit-ko">최대 10줄까지 입력 가능해요</span>
+        <span class="limit-msg" id="limit-ko">최대 5줄까지 입력 가능해요</span>
       </div>
       <button class="btn-go" id="btn-ko" onclick="doTranslate('ko')">번역</button>
     </div>
@@ -211,7 +211,7 @@
 
 <script>
 var RULE = 'Korean Hangul only in all Korean fields. No Chinese or Japanese characters.\n';
-var MAX_LINES = 10;
+var MAX_LINES = 5;
 
 function switchTab(t) {
   ['es','ko','conj'].forEach(function(id) {
@@ -288,16 +288,25 @@ async function fetchCorrection(text) {
   return await callAPI(p, text);
 }
 
-// 문법+동사 (합쳐서 1회 호출)
-async function fetchGrammarAndVerbs(isES, text) {
+// 문법+동사 - 항상 스페인어 기준으로 분석
+async function fetchGrammarAndVerbs(isES, text, esTranslation) {
   var conj = '[{"pronoun":"yo","form":""},{"pronoun":"tu","form":""},{"pronoun":"el/ella","form":""},{"pronoun":"nosotros","form":""},{"pronoun":"vosotros","form":""},{"pronoun":"ellos","form":""}]';
-  var p = RULE + 'Spanish tutor. JSON only. Be concise (max 20 chars per desc).\n' +
-    (isES ? 'Analyze this Spanish sentence grammar. Find main verbs and give Spanish infinitive.'
-           : 'Input is Korean. Mentally translate to Spanish, then analyze that Spanish grammar and find Spanish verbs.') + '\n' +
-    'Return: {"analysis":[{"tag":"주어","desc":"KO"},{"tag":"동사","desc":"KO"},{"tag":"시제","desc":"KO"}],' +
-    '"verbs":[{"infinitive":"SPANISH infinitive only","meaning":"한국어뜻","explanation":"KO",' +
-    '"conjugations":' + conj + '}],"notes":"KO max30chars"}\nInput: ' + text;
-  return await callAPI(p, text);
+  // 한국어 입력이면 번역된 스페인어로 분석
+  var target = isES ? text : (esTranslation || text);
+  var isLong = target.split('\n').length > 2 || target.length > 150;
+
+  if (isLong) {
+    var p = RULE + 'Spanish tutor. JSON only. Find the 1-2 most important Spanish verbs only.\n' +
+      'Analyze this Spanish text. Spanish infinitive only.\n' +
+      'Return: {"analysis":[],"verbs":[{"infinitive":"SPANISH only","meaning":"한국어뜻","explanation":"한국어설명(20자이내)","conjugations":' + conj + '}],"notes":""}\nInput: ' + target;
+    return await callAPI(p, target);
+  } else {
+    var p = RULE + 'Spanish tutor. JSON only. Concise (max 20 chars per desc).\n' +
+      'Analyze this SPANISH sentence grammar. Spanish infinitive only for verbs.\n' +
+      'Return: {"analysis":[{"tag":"주어","desc":"KO"},{"tag":"동사","desc":"KO"},{"tag":"시제","desc":"KO"}],' +
+      '"verbs":[{"infinitive":"SPANISH only","meaning":"한국어뜻","explanation":"KO","conjugations":' + conj + '}],"notes":"KO max30chars"}\nInput: ' + target;
+    return await callAPI(p, target);
+  }
 }
 
 // 예제
@@ -385,48 +394,77 @@ async function doTranslate(mode) {
   setHTML('r-gram-' + mode, '<span class="ph">로딩 중...</span>');
   setHTML('r-ex-' + mode, '<span class="ph">로딩 중...</span>');
 
-  // 번역 / 교정(ES만) / 문법+동사 — 동시 호출
-  var jobs = [
-    fetchTranslation(isES, raw)
-      .then(function(t) { setText('r-trans-' + mode, t); })
-      .catch(function(e) { setText('r-trans-' + mode, '오류: ' + e.message); }),
+  if (isES) {
+    // 스페인어: 번역/교정/문법+동사/예제 4개 동시 병렬
+    await Promise.all([
+      fetchTranslation(true, raw).then(function(t) {
+        var el = document.getElementById('r-trans-es');
+        el.style.whiteSpace = 'pre-wrap';
+        el.textContent = t;
+      }).catch(function(e) { setText('r-trans-es', '오류: ' + e.message); }),
 
-    isES
-      ? fetchCorrection(raw)
-          .then(function(c) { renderCorr(c); })
-          .catch(function() { setHTML('r-corr-es', '<span class="err-txt">오류 발생</span>'); })
-      : Promise.resolve(),
+      fetchCorrection(raw).then(function(c) {
+        renderCorr(c);
+      }).catch(function() { setHTML('r-corr-es', '<span class="err-txt">오류 발생</span>'); }),
 
-    fetchGrammarAndVerbs(isES, raw)
-      .then(function(d) { renderGram(d, mode); })
-      .catch(function() { setHTML('r-gram-' + mode, '<span class="err-txt">오류 발생</span>'); })
-  ];
+      fetchGrammarAndVerbs(true, raw, '').then(function(d) {
+        renderGram(d, 'es');
+      }).catch(function() { setHTML('r-gram-es', '<span class="ph">분석할 수 없습니다. 문장을 줄여주세요.</span>'); }),
 
-  await Promise.all(jobs);
+      fetchExamples(true, raw).then(function(arr) {
+        renderEx(arr, 'es');
+      }).catch(function() { setHTML('r-ex-es', '<span class="err-txt">오류 발생</span>'); })
+    ]);
 
-  // 예제는 마지막
-  try { renderEx(await fetchExamples(isES, raw), mode); }
-  catch(e) { setHTML('r-ex-' + mode, '<span class="err-txt">오류 발생</span>'); }
+  } else {
+    // 한국어: 번역 먼저 → 번역 결과로 문법+동사/예제 병렬
+    var esTranslation = '';
+    try {
+      var t = await fetchTranslation(false, raw);
+      var el = document.getElementById('r-trans-ko');
+      el.style.whiteSpace = 'pre-wrap';
+      el.textContent = t;
+      esTranslation = t;
+    } catch(e) { setText('r-trans-ko', '오류: ' + e.message); }
+
+    await Promise.all([
+      fetchGrammarAndVerbs(false, raw, esTranslation).then(function(d) {
+        renderGram(d, 'ko');
+      }).catch(function() { setHTML('r-gram-ko', '<span class="ph">분석할 수 없습니다. 문장을 줄여주세요.</span>'); }),
+
+      fetchExamples(false, raw).then(function(arr) {
+        renderEx(arr, 'ko');
+      }).catch(function() { setHTML('r-ex-ko', '<span class="err-txt">오류 발생</span>'); })
+    ]);
+  }
 
   btn.disabled = false;
   btn.innerHTML = '번역';
 }
 
-// 동사 변환표 — 단순 1회 호출
+// 동사 변환표 — 기본정보 + 시제 2회 병렬
 async function doConjugate() {
   var verb = document.getElementById('conj-input').value.trim();
   if (!verb) return;
   var btn = document.getElementById('btn-conj');
   btn.disabled = true; btn.textContent = '...';
-  document.getElementById('conj-result').innerHTML = '';
 
   var r6 = '[{"pronoun":"yo","form":""},{"pronoun":"tu","form":""},{"pronoun":"el/ella","form":""},{"pronoun":"nosotros","form":""},{"pronoun":"vosotros","form":""},{"pronoun":"ellos","form":""}]';
   var r2 = '[{"pronoun":"tu","form":""},{"pronoun":"vosotros","form":""}]';
-  var prompt = RULE + 'Spanish conjugation expert. JSON only, no markdown.\n' +
-    'Input: Spanish verb infinitive.\n' +
-    'Return: {"verb":"infinitive","meanings":["뜻1","뜻2","뜻3"],"verb_type":"동사유형(한국어)",' +
-    '"nonfinite":{"past_participle":"형태","gerund":"형태"},' +
-    '"tenses":[' +
+
+  var pInfo = RULE + 'Spanish conjugation expert. JSON only.
+' +
+    'Return basic info for this Spanish verb:
+' +
+    '{"verb":"infinitive","meanings":["뜻1","뜻2","뜻3"],"verb_type":"동사유형(한국어)","nonfinite":{"past_participle":"형태","gerund":"형태"}}
+' +
+    'Verb: ' + verb;
+
+  var pTenses = RULE + 'Spanish conjugation expert. JSON only.
+' +
+    'Conjugate this Spanish verb for all tenses:
+' +
+    '{"tenses":[' +
     '{"tense":"Presente","name_ko":"현재형","rows":' + r6 + '},' +
     '{"tense":"Pret.Indefinido","name_ko":"단순과거","rows":' + r6 + '},' +
     '{"tense":"Pret.Imperfecto","name_ko":"불완전과거","rows":' + r6 + '},' +
@@ -434,42 +472,56 @@ async function doConjugate() {
     '{"tense":"Condicional","name_ko":"조건법","rows":' + r6 + '},' +
     '{"tense":"Pret.Perfecto","name_ko":"현재완료","rows":' + r6 + '},' +
     '{"tense":"Subjuntivo","name_ko":"현재접속법","rows":' + r6 + '},' +
-    '{"tense":"Imperativo","name_ko":"명령문","rows":' + r2 + '}' +
-    ']}\nVerb: ' + verb;
+    '{"tense":"Imperativo","name_ko":"명령문","rows":' + r2 + '}]}
+' +
+    'Verb: ' + verb;
 
-  try {
-    var p = await callAPI(prompt, verb);
-    var h = '<div class="conj-result-card"><div class="conj-result-hd">';
-    h += '<div class="conj-verb-title">' + p.verb + '</div>';
-    h += '<div class="conj-verb-sub">' + (p.verb_type || '') + '</div>';
-    if (p.meanings && p.meanings.length) {
-      h += '<div class="conj-meanings-row">';
-      for (var i = 0; i < p.meanings.length; i++) {
-        h += '<span class="conj-mean-badge">' + p.meanings[i] + '</span>';
+  // 뼈대 먼저 표시
+  document.getElementById('conj-result').innerHTML =
+    '<div class="conj-result-card">' +
+    '<div class="conj-result-hd" id="conj-hd"><span style="color:var(--ink-3);font-size:13px">로딩 중...</span></div>' +
+    '<div id="conj-tenses"><div style="padding:16px;color:var(--ink-3);font-size:13px">시제 로딩 중...</div></div>' +
+    '</div>';
+
+  await Promise.all([
+    callAPI(pInfo, verb).then(function(p) {
+      var h = '<div class="conj-verb-title">' + p.verb + '</div>';
+      h += '<div class="conj-verb-sub">' + (p.verb_type || '') + '</div>';
+      if (p.meanings && p.meanings.length) {
+        h += '<div class="conj-meanings-row">';
+        for (var i = 0; i < p.meanings.length; i++) {
+          h += '<span class="conj-mean-badge">' + p.meanings[i] + '</span>';
+        }
+        h += '</div>';
       }
-      h += '</div>';
-    }
-    if (p.nonfinite) {
-      h += '<div class="nonfinite-row">';
-      h += '<span class="nonfinite-item"><span class="nonfinite-label">과거분사</span><span class="nonfinite-form">' + (p.nonfinite.past_participle || '-') + '</span></span>';
-      h += '<span class="nonfinite-item"><span class="nonfinite-label">동명사</span><span class="nonfinite-form">' + (p.nonfinite.gerund || '-') + '</span></span>';
-      h += '</div>';
-    }
-    h += '</div>';
-    for (var i = 0; i < p.tenses.length; i++) {
-      var t = p.tenses[i];
-      h += '<div class="tense-block"><div class="tense-hd"><span class="tense-badge">' + t.tense + '</span><span class="tense-name-ko">' + t.name_ko + '</span></div>';
-      h += '<div class="tense-rows">';
-      for (var j = 0; j < t.rows.length; j++) {
-        h += '<div class="tense-row"><span class="tense-pro">' + t.rows[j].pronoun + '</span><span class="tense-form">' + t.rows[j].form + '</span></div>';
+      if (p.nonfinite) {
+        h += '<div class="nonfinite-row">';
+        h += '<span class="nonfinite-item"><span class="nonfinite-label">과거분사</span><span class="nonfinite-form">' + (p.nonfinite.past_participle || '-') + '</span></span>';
+        h += '<span class="nonfinite-item"><span class="nonfinite-label">동명사</span><span class="nonfinite-form">' + (p.nonfinite.gerund || '-') + '</span></span>';
+        h += '</div>';
       }
-      h += '</div></div>';
-    }
-    h += '</div>';
-    document.getElementById('conj-result').innerHTML = h;
-  } catch(e) {
-    document.getElementById('conj-result').innerHTML = '<p style="color:var(--red);font-size:13px;padding:12px 0">오류: ' + e.message + '</p>';
-  }
+      document.getElementById('conj-hd').innerHTML = h;
+    }).catch(function(e) {
+      document.getElementById('conj-hd').innerHTML = '<span style="color:var(--red);font-size:13px">오류: ' + e.message + '</span>';
+    }),
+
+    callAPI(pTenses, verb).then(function(p) {
+      var h = '';
+      for (var i = 0; i < p.tenses.length; i++) {
+        var t = p.tenses[i];
+        h += '<div class="tense-block"><div class="tense-hd"><span class="tense-badge">' + t.tense + '</span><span class="tense-name-ko">' + t.name_ko + '</span></div>';
+        h += '<div class="tense-rows">';
+        for (var j = 0; j < t.rows.length; j++) {
+          h += '<div class="tense-row"><span class="tense-pro">' + t.rows[j].pronoun + '</span><span class="tense-form">' + t.rows[j].form + '</span></div>';
+        }
+        h += '</div></div>';
+      }
+      document.getElementById('conj-tenses').innerHTML = h;
+    }).catch(function(e) {
+      document.getElementById('conj-tenses').innerHTML = '<p style="color:var(--red);font-size:13px;padding:16px">오류: ' + e.message + '</p>';
+    })
+  ]);
+
   btn.disabled = false; btn.textContent = '변환';
 }
 </script>
