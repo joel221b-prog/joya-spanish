@@ -1,25 +1,24 @@
-export default async (request, context) => {
-  if (request.method === 'OPTIONS') {
-    return new Response(null, {
-      status: 200,
+exports.handler = async (event) => {
+  if (event.httpMethod === 'OPTIONS') {
+    return {
+      statusCode: 200,
       headers: {
         'Access-Control-Allow-Origin': '*',
         'Access-Control-Allow-Headers': 'Content-Type',
         'Access-Control-Allow-Methods': 'POST, OPTIONS'
       }
-    });
+    };
   }
 
-  if (request.method !== 'POST') {
-    return new Response('Method Not Allowed', { status: 405 });
+  if (event.httpMethod !== 'POST') {
+    return { statusCode: 405, body: 'Method Not Allowed' };
   }
 
-  const API_KEY = Netlify.env.get('GEMINI_API_KEY');
+  const API_KEY = process.env.GEMINI_API_KEY;
 
   try {
-    const body = await request.json();
+    const body = JSON.parse(event.body);
     const prompt = body.system + '\n\n' + body.messages[0].content;
-
     const url = 'https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent';
 
     const response = await fetch(url, {
@@ -41,27 +40,26 @@ export default async (request, context) => {
     const data = await response.json();
 
     if (data.error) {
-      return new Response(JSON.stringify({ error: data.error.message }), {
-        status: 500,
-        headers: { 'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*' }
-      });
+      return {
+        statusCode: 500,
+        headers: { 'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*' },
+        body: JSON.stringify({ error: data.error.message })
+      };
     }
 
     const text = data.candidates[0].content.parts[0].text;
 
-    return new Response(JSON.stringify({ content: [{ type: 'text', text }] }), {
-      status: 200,
-      headers: { 'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*' }
-    });
+    return {
+      statusCode: 200,
+      headers: { 'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*' },
+      body: JSON.stringify({ content: [{ type: 'text', text }] })
+    };
 
   } catch (err) {
-    return new Response(JSON.stringify({ error: err.message }), {
-      status: 500,
-      headers: { 'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*' }
-    });
+    return {
+      statusCode: 500,
+      headers: { 'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*' },
+      body: JSON.stringify({ error: err.message })
+    };
   }
-};
-
-export const config = {
-  path: '/.netlify/functions/translate'
 };
