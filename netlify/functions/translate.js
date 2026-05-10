@@ -14,24 +14,23 @@ exports.handler = async (event) => {
     return { statusCode: 405, body: 'Method Not Allowed' };
   }
 
-  const API_KEY = process.env.GROQ_API_KEY;
+  const API_KEY = process.env.GEMINI_API_KEY;
 
   try {
     const body = JSON.parse(event.body);
+    const prompt = body.system + '\n\n사용자 입력: ' + body.messages[0].content;
 
-    const response = await fetch('https://api.groq.com/openai/v1/chat/completions', {
+    const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${API_KEY}`;
+
+    const response = await fetch(url, {
       method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization': `Bearer ${API_KEY}`
-      },
+      headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
-        model: 'llama-3.3-70b-versatile',
-        max_tokens: 1200,
-        messages: [
-          { role: 'system', content: body.system },
-          { role: 'user', content: body.messages[0].content }
-        ]
+        contents: [{ parts: [{ text: prompt }] }],
+        generationConfig: {
+          temperature: 0.3,
+          maxOutputTokens: 1500
+        }
       })
     });
 
@@ -41,22 +40,18 @@ exports.handler = async (event) => {
       return {
         statusCode: 500,
         headers: { 'Access-Control-Allow-Origin': '*' },
-        body: JSON.stringify({ error: data.error.message })
+        body: JSON.stringify({ error: `API 오류: ${data.error.message}` })
       };
     }
 
-    const content = data.choices[0].message.content;
+    const text = data.candidates[0].content.parts[0].text;
 
     return {
       statusCode: 200,
-      headers: {
-        'Content-Type': 'application/json',
-        'Access-Control-Allow-Origin': '*'
-      },
-      body: JSON.stringify({
-        content: [{ type: 'text', text: content }]
-      })
+      headers: { 'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*' },
+      body: JSON.stringify({ content: [{ type: 'text', text }] })
     };
+
   } catch (err) {
     return {
       statusCode: 500,
