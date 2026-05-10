@@ -25,10 +25,11 @@
 
     /* HEADER */
     .hd { background: var(--white); padding: 16px 20px 14px; display: flex; align-items: center; justify-content: space-between; border-bottom: 1px solid var(--border); position: sticky; top: 0; z-index: 20; }
+    .hd::after { content: ""; display: block; position: absolute; bottom: 0; left: 0; right: 0; height: 2px; background: linear-gradient(90deg, var(--p) 0%, #9B7FD4 50%, transparent 100%); }
     .hd-left { display: flex; align-items: center; gap: 10px; }
-    .hd-name { font-family: 'DM Sans', sans-serif; font-weight: 500; font-size: 17px; color: var(--ink); letter-spacing: -0.3px; }
-    .hd-sub { font-size: 11px; color: var(--ink-3); margin-top: 1px; }
-    .hd-ver { font-size: 10px; color: var(--ink-3); letter-spacing: 0.02em; font-family: 'DM Sans', sans-serif; }
+    .hd-name { font-family: 'DM Sans', sans-serif; font-weight: 500; font-size: 20px; color: var(--p); letter-spacing: -0.5px; }
+    .hd-sub { font-size: 11px; color: var(--ink-3); margin-top: 2px; letter-spacing: 0.02em; }
+    .hd-ver { font-size: 10px; color: var(--p-mid); letter-spacing: 0.04em; font-family: 'DM Sans', sans-serif; background: var(--p-light); padding: 3px 8px; border-radius: 100px; }
 
     /* TABS */
     .tabs { display: flex; background: var(--white); border-bottom: 1px solid var(--border); padding: 0 16px; gap: 0; position: sticky; top: 65px; z-index: 19; }
