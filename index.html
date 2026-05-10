@@ -70,6 +70,8 @@
     .c-gram .card-hd{background:var(--amber-bg);color:var(--amber)}
     .c-gram .card-hd-dot{background:var(--amber)}
     .c-ex .card-hd{background:var(--blue-bg);color:var(--blue)}
+    .c-verb .card-hd{background:#EDF9F5;color:#1A6B5A}
+    .c-verb .card-hd-dot{background:#1A6B5A}
     .c-ex .card-hd-dot{background:var(--blue)}
     .ph{color:var(--ink-3);font-size:13px;font-style:italic;white-space:normal}
     .err-txt{color:var(--red);font-size:13px;white-space:normal}
@@ -173,7 +175,8 @@
   <div class="results" id="results-es">
     <div class="card c-trans"><div class="card-hd"><span class="card-hd-dot"></span>해석</div><div class="card-bd" id="r-trans-es"><span class="ph">번역 결과가 여기 표시됩니다</span></div></div>
     <div class="card c-corr"><div class="card-hd"><span class="card-hd-dot"></span>문장 교정</div><div class="card-bd" id="r-corr-es"><span class="ph">교정 내용이 여기 표시됩니다</span></div></div>
-    <div class="card c-gram"><div class="card-hd"><span class="card-hd-dot"></span>문법 분석 &amp; 동사 변환</div><div class="card-bd" id="r-gram-es"><span class="ph">문법 설명이 여기 표시됩니다</span></div></div>
+    <div class="card c-gram"><div class="card-hd"><span class="card-hd-dot"></span>문법 분석</div><div class="card-bd" id="r-gram-es"><span class="ph">문법 설명이 여기 표시됩니다</span></div></div>
+    <div class="card c-verb"><div class="card-hd"><span class="card-hd-dot"></span>동사 변환</div><div class="card-bd" id="r-verb-es"><span class="ph">동사 변환이 여기 표시됩니다</span></div></div>
     <div class="card c-ex"><div class="card-hd"><span class="card-hd-dot"></span>비슷한 예제</div><div class="card-bd" id="r-ex-es"><span class="ph">관련 예제 문장이 여기 표시됩니다</span></div></div>
   </div>
 </div>
@@ -192,7 +195,8 @@
   </div>
   <div class="results" id="results-ko">
     <div class="card c-trans"><div class="card-hd"><span class="card-hd-dot"></span>스페인어 번역</div><div class="card-bd" id="r-trans-ko"><span class="ph">번역 결과가 여기 표시됩니다</span></div></div>
-    <div class="card c-gram"><div class="card-hd"><span class="card-hd-dot"></span>문법 분석 &amp; 동사 변환</div><div class="card-bd" id="r-gram-ko"><span class="ph">문법 설명이 여기 표시됩니다</span></div></div>
+    <div class="card c-gram"><div class="card-hd"><span class="card-hd-dot"></span>문법 분석</div><div class="card-bd" id="r-gram-ko"><span class="ph">문법 설명이 여기 표시됩니다</span></div></div>
+    <div class="card c-verb"><div class="card-hd"><span class="card-hd-dot"></span>동사 변환</div><div class="card-bd" id="r-verb-ko"><span class="ph">동사 변환이 여기 표시됩니다</span></div></div>
     <div class="card c-ex"><div class="card-hd"><span class="card-hd-dot"></span>비슷한 예제</div><div class="card-bd" id="r-ex-ko"><span class="ph">관련 예제 문장이 여기 표시됩니다</span></div></div>
   </div>
 </div>
@@ -360,7 +364,7 @@ function renderGram(d, suffix) {
   if (d.analysis && d.analysis.length) {
     var validItems = d.analysis.filter(function(a) { return a && (a.tag || a.label || a.category) && (a.desc || a.description || a.explanation); });
     if (validItems.length) {
-      h += '<p class="gram-sec-title">문법 분석</p><div class="gram-analysis">';
+      h += '<div class="gram-analysis">';
       for (var i = 0; i < validItems.length; i++) {
         var a = validItems[i];
         var tag = a.tag || a.label || a.category || '';
@@ -370,23 +374,38 @@ function renderGram(d, suffix) {
       h += '</div>';
     }
   }
-  if (d.verbs && d.verbs.length) {
-    h += '<p class="gram-sec-title">동사 변환</p>';
-    for (var i = 0; i < d.verbs.length; i++) {
-      var v = d.verbs[i];
-      h += '<div class="verb-pill"><span class="verb-name">' + v.infinitive + '</span><span class="verb-mean">' + v.meaning + '</span></div>';
-      h += '<p class="gram-exp">' + v.explanation + '</p>';
-      if (v.conjugations && v.conjugations.length) {
+  if (d.notes) h += '<div class="gram-note" style="margin-top:10px">' + d.notes + '</div>';
+  el.innerHTML = h || '<span class="ph">문법 정보 없음</span>';
+}
+
+function renderVerbs(arr, suffix) {
+  var el = document.getElementById('r-verb-' + suffix);
+  if (!arr || !arr.length) { el.innerHTML = '<span class="ph">동사 정보 없음</span>'; return; }
+  var h = '';
+  for (var i = 0; i < arr.length; i++) {
+    var v = arr[i];
+    h += '<div class="verb-pill"><span class="verb-name">' + v.infinitive + '</span><span class="verb-mean">' + v.meaning + '</span></div>';
+    h += '<p class="gram-exp">' + v.explanation + '</p>';
+    if (v.tenses && v.tenses.length) {
+      // 시제별 표시
+      for (var t = 0; t < v.tenses.length; t++) {
+        var ts = v.tenses[t];
+        h += '<p class="gram-sec-title" style="margin-top:10px">' + ts.name + '</p>';
         h += '<div class="conj-grid">';
-        for (var j = 0; j < v.conjugations.length; j++) {
-          h += '<div class="conj-cell"><span class="conj-pro">' + v.conjugations[j].pronoun + '</span><span class="conj-form">' + v.conjugations[j].form + '</span></div>';
+        for (var j = 0; j < ts.rows.length; j++) {
+          h += '<div class="conj-cell"><span class="conj-pro">' + ts.rows[j].pronoun + '</span><span class="conj-form">' + ts.rows[j].form + '</span></div>';
         }
         h += '</div>';
       }
+    } else if (v.conjugations && v.conjugations.length) {
+      h += '<div class="conj-grid">';
+      for (var j = 0; j < v.conjugations.length; j++) {
+        h += '<div class="conj-cell"><span class="conj-pro">' + v.conjugations[j].pronoun + '</span><span class="conj-form">' + v.conjugations[j].form + '</span></div>';
+      }
+      h += '</div>';
     }
   }
-  if (d.notes) h += '<p class="gram-sec-title">문법 노트</p><div class="gram-note">' + d.notes + '</div>';
-  el.innerHTML = h || '<span class="ph">문법 정보 없음</span>';
+  el.innerHTML = h;
 }
 
 async function doTranslate(mode) {
@@ -404,6 +423,7 @@ async function doTranslate(mode) {
   setText('r-trans-' + mode, '번역 중...');
   if (isES) setHTML('r-corr-es', '<span class="ph">분석 중...</span>');
   setHTML('r-gram-' + mode, '<span class="ph">로딩 중...</span>');
+  setHTML('r-verb-' + mode, '<span class="ph">로딩 중...</span>');
   setHTML('r-ex-' + mode, '<span class="ph">로딩 중...</span>');
 
   if (isES) {
@@ -415,15 +435,20 @@ async function doTranslate(mode) {
       el.textContent = t;
     } catch(e) { setText('r-trans-es', '오류: ' + e.message); }
 
-    // 2단계: 교정/문법/예제 병렬
+    // 2단계: 교정/문법분석/동사변환/예제 병렬
+    setHTML('r-verb-es', '<span class="ph">로딩 중...</span>');
     await Promise.all([
       fetchCorrection(raw).then(function(c) {
         renderCorr(c);
       }).catch(function() { setHTML('r-corr-es', '<span class="err-txt">오류 발생</span>'); }),
 
-      fetchGrammarAndVerbs(true, raw, '').then(function(d) {
+      fetchGrammar(raw).then(function(d) {
         renderGram(d, 'es');
-      }).catch(function() { setHTML('r-gram-es', '<span class="ph">분석할 수 없습니다. 문장을 줄여주세요.</span>'); }),
+      }).catch(function() { setHTML('r-gram-es', '<span class="ph">분석할 수 없습니다.</span>'); }),
+
+      fetchVerbs(raw).then(function(arr) {
+        renderVerbs(arr, 'es');
+      }).catch(function() { setHTML('r-verb-es', '<span class="err-txt">오류 발생</span>'); }),
 
       fetchExamples(true, raw).then(function(arr) {
         renderEx(arr, 'es');
@@ -441,11 +466,17 @@ async function doTranslate(mode) {
       el.textContent = esTranslation;
     } catch(e) { setText('r-trans-ko', '오류: ' + e.message); }
 
-    // 2단계: 문법/예제 병렬
+    // 2단계: 문법분석/동사변환/예제 병렬
+    var esTarget = esTranslation || raw;
+    setHTML('r-verb-ko', '<span class="ph">로딩 중...</span>');
     await Promise.all([
-      fetchGrammarAndVerbs(false, esTranslation || raw, esTranslation).then(function(d) {
+      fetchGrammar(esTarget).then(function(d) {
         renderGram(d, 'ko');
-      }).catch(function() { setHTML('r-gram-ko', '<span class="ph">분석할 수 없습니다. 문장을 줄여주세요.</span>'); }),
+      }).catch(function() { setHTML('r-gram-ko', '<span class="ph">분석할 수 없습니다.</span>'); }),
+
+      fetchVerbs(esTarget).then(function(arr) {
+        renderVerbs(arr, 'ko');
+      }).catch(function() { setHTML('r-verb-ko', '<span class="err-txt">오류 발생</span>'); }),
 
       fetchExamples(false, raw).then(function(arr) {
         renderEx(arr, 'ko');
