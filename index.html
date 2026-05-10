@@ -5,6 +5,9 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
   <title>jOYA</title>
   <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='22' fill='%237C5CBF'/><text y='.9em' font-size='60' x='10' fill='white' font-family='sans-serif' font-weight='bold'>j</text></svg>">
+  <link rel="manifest" href="/manifest.json">
+  <meta name="theme-color" content="#7C5CBF">
+  <link rel="apple-touch-icon" href="/icon-192.png">
   <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;600&family=DM+Sans:wght@400;500&display=swap" rel="stylesheet">
   <style>
     *,*::before,*::after{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
@@ -570,6 +573,16 @@ function toggleAllTenses() {
   arrows.forEach(function(a) { a.classList.toggle('open', !allOpen); });
   updateExpandBtn();
 }
+</script>
+ <script>
+  // 서비스 워커 등록 스크립트
+  if ('serviceWorker' in navigator) {
+    window.addEventListener('load', () => {
+      navigator.serviceWorker.register('/sw.js')
+        .then(reg => console.log('Service Worker 등록 성공:', reg.scope))
+        .catch(err => console.log('Service Worker 등록 실패:', err));
+    });
+  }
 </script>
 </body>
 </html>
