@@ -2,382 +2,484 @@
 <html lang="ko">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>jOYA 스페인어 번역기</title>
-  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700&display=swap" rel="stylesheet">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+  <title>jOYA</title>
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;600&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
   <style>
-    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+
     :root {
-      --md-primary: #6750A4;
-      --md-primary-container: #EADDFF;
-      --md-on-primary-container: #21005D;
-      --md-secondary: #625B71;
-      --md-secondary-container: #E8DEF8;
-      --md-surface: #FFFBFE;
-      --md-surface-variant: #E7E0EC;
-      --md-on-surface: #1C1B1F;
-      --md-on-surface-variant: #49454F;
-      --md-outline: #79747E;
-      --md-outline-variant: #CAC4D0;
-      --md-error: #B3261E;
-      --md-error-container: #F9DEDC;
-      --md-green: #386A20;
-      --md-green-container: #C0EFA4;
-      --md-blue: #0061A4;
-      --md-blue-container: #D1E4FF;
-      --shadow-sm: 0 1px 2px rgba(0,0,0,0.1), 0 2px 6px rgba(0,0,0,0.06);
-      --shadow-md: 0 2px 8px rgba(0,0,0,0.1), 0 4px 16px rgba(0,0,0,0.06);
+      --p: #7C5CBF;
+      --p-light: #F3EEFF;
+      --p-mid: #C4ADEE;
+      --surface: #FAFAFA;
+      --white: #FFFFFF;
+      --ink: #111111;
+      --ink-2: #555555;
+      --ink-3: #999999;
+      --border: rgba(0,0,0,0.07);
+      --border-focus: #7C5CBF;
+      --green: #1A7A4A;
+      --green-bg: #EDFAF3;
+      --blue: #1A5EAA;
+      --blue-bg: #EDF4FF;
+      --amber: #8A5A00;
+      --amber-bg: #FFF8EC;
+      --red: #A32020;
+      --red-bg: #FFF0F0;
+      --r: 20px;
+      --r-sm: 12px;
+      --r-xs: 8px;
     }
-    body { font-family: 'Noto Sans KR', sans-serif; background: var(--md-surface); color: var(--md-on-surface); min-height: 100vh; }
 
-    .header { background: white; border-bottom: 1px solid var(--md-outline-variant); padding: 0 20px; height: 64px; display: flex; align-items: center; gap: 12px; position: sticky; top: 0; z-index: 10; }
-    .header-version { margin-left: auto; font-size: 10px; color: #C4B8D4; letter-spacing: 0.03em; }
-    .header-icon { width: 40px; height: 40px; background: var(--md-primary-container); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 20px; }
-    .header-title { font-size: 18px; font-weight: 700; color: var(--md-primary); }
-    .header-sub { font-size: 11px; color: var(--md-on-surface-variant); margin-top: 1px; }
+    html, body { height: 100%; }
 
-    .main { max-width: 560px; margin: 0 auto; padding: 24px 16px 80px; }
+    body {
+      font-family: 'Noto Sans KR', sans-serif;
+      background: var(--surface);
+      color: var(--ink);
+      max-width: 480px;
+      margin: 0 auto;
+      min-height: 100%;
+    }
 
-    .segment-wrap { display: flex; background: var(--md-surface-variant); border-radius: 28px; padding: 4px; margin-bottom: 20px; gap: 2px; }
-    .seg-btn { flex: 1; display: flex; align-items: center; justify-content: center; gap: 6px; padding: 10px 16px; border-radius: 24px; border: none; background: transparent; cursor: pointer; font-size: 14px; font-weight: 500; color: var(--md-on-surface-variant); font-family: 'Noto Sans KR', sans-serif; transition: all 0.2s; }
-    .seg-btn.active { background: var(--md-primary); color: white; box-shadow: var(--shadow-sm); }
-    .seg-btn .flag { font-size: 20px; }
-    .lang-code { font-size: 10px; font-weight: 800; letter-spacing: 0.08em; padding: 2px 6px; border-radius: 6px; background: rgba(255,255,255,0.25); }
-    .seg-btn.active .lang-code { background: rgba(255,255,255,0.25); color: white; }
-    .seg-btn:not(.active) .lang-code { background: rgba(103,80,164,0.12); color: var(--md-primary); }
-    .seg-arrow { font-size: 16px; color: var(--md-on-surface-variant); display: flex; align-items: center; padding: 0 2px; }
+    /* ── HEADER ── */
+    .hd {
+      background: var(--white);
+      padding: 16px 20px 14px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      border-bottom: 1px solid var(--border);
+      position: sticky;
+      top: 0;
+      z-index: 20;
+    }
+    .hd-left { display: flex; align-items: center; gap: 10px; }
+    .hd-logo {
+      width: 36px; height: 36px;
+      background: linear-gradient(135deg, #7C5CBF 0%, #9B7FD4 100%);
+      border-radius: 10px;
+      display: flex; align-items: center; justify-content: center;
+      color: white;
+      font-family: 'DM Sans', sans-serif;
+      font-weight: 500;
+      font-size: 14px;
+      letter-spacing: -0.5px;
+    }
+    .hd-name { font-family: 'DM Sans', sans-serif; font-weight: 500; font-size: 17px; color: var(--ink); letter-spacing: -0.3px; }
+    .hd-sub { font-size: 11px; color: var(--ink-3); margin-top: 1px; }
+    .hd-ver { font-size: 10px; color: var(--ink-3); letter-spacing: 0.02em; font-family: 'DM Sans', sans-serif; }
 
-    .input-card { background: white; border-radius: 16px; border: 1.5px solid var(--md-outline-variant); padding: 16px; transition: border-color 0.2s, box-shadow 0.2s; }
-    .input-card:focus-within { border-color: var(--md-primary); box-shadow: 0 0 0 3px rgba(103,80,164,0.12); }
-    .input-card textarea { width: 100%; min-height: 52px; border: none; outline: none; font-size: 15px; font-family: 'Noto Sans KR', sans-serif; color: var(--md-on-surface); background: transparent; resize: none; line-height: 1.6; overflow-y: hidden; }
-    .input-card textarea::placeholder { color: var(--md-outline); }
-    .input-footer { display: flex; align-items: center; justify-content: space-between; margin-top: 12px; padding-top: 10px; border-top: 1px solid var(--md-outline-variant); }
-    .input-hint { font-size: 12px; color: var(--md-on-surface-variant); }
-    .go-btn { display: flex; align-items: center; gap: 6px; padding: 10px 22px; background: var(--md-primary); color: white; border: none; border-radius: 28px; font-size: 14px; font-weight: 700; cursor: pointer; font-family: 'Noto Sans KR', sans-serif; transition: all 0.2s; box-shadow: var(--shadow-sm); }
-    .go-btn:hover { background: #7965AF; box-shadow: var(--shadow-md); }
-    .go-btn:active { transform: scale(0.97); }
-    .go-btn:disabled { background: var(--md-outline-variant); box-shadow: none; cursor: default; }
-    .spinner { width: 16px; height: 16px; border: 2px solid rgba(255,255,255,0.3); border-top-color: white; border-radius: 50%; animation: spin 0.7s linear infinite; }
+    /* ── MAIN ── */
+    .main { padding: 20px 16px 80px; }
+
+    /* ── MODE TOGGLE ── */
+    .toggle {
+      display: flex;
+      background: var(--white);
+      border: 1px solid var(--border);
+      border-radius: 100px;
+      padding: 4px;
+      margin-bottom: 16px;
+      gap: 4px;
+    }
+    .tog-btn {
+      flex: 1;
+      padding: 9px 0;
+      border-radius: 100px;
+      border: none;
+      background: none;
+      font-size: 13px;
+      font-weight: 500;
+      color: var(--ink-3);
+      font-family: 'Noto Sans KR', sans-serif;
+      cursor: pointer;
+      transition: all 0.2s;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+    }
+    .tog-btn.on {
+      background: var(--p);
+      color: white;
+      box-shadow: 0 2px 8px rgba(124,92,191,0.3);
+    }
+    .tog-badge {
+      font-size: 9px;
+      font-weight: 600;
+      letter-spacing: 0.06em;
+      padding: 2px 5px;
+      border-radius: 4px;
+      font-family: 'DM Sans', sans-serif;
+    }
+    .tog-btn.on .tog-badge { background: rgba(255,255,255,0.2); color: white; }
+    .tog-btn:not(.on) .tog-badge { background: var(--p-light); color: var(--p); }
+    .tog-arrow { font-size: 14px; color: var(--ink-3); align-self: center; flex-shrink: 0; }
+
+    /* ── INPUT CARD ── */
+    .inp-wrap {
+      background: var(--white);
+      border: 1.5px solid var(--border);
+      border-radius: var(--r);
+      padding: 16px 16px 12px;
+      transition: border-color 0.2s, box-shadow 0.2s;
+      margin-bottom: 12px;
+    }
+    .inp-wrap:focus-within {
+      border-color: var(--p);
+      box-shadow: 0 0 0 4px rgba(124,92,191,0.1);
+    }
+    textarea {
+      width: 100%;
+      min-height: 56px;
+      border: none;
+      outline: none;
+      font-size: 15px;
+      font-family: 'Noto Sans KR', sans-serif;
+      font-weight: 400;
+      color: var(--ink);
+      background: transparent;
+      resize: none;
+      line-height: 1.6;
+      overflow: hidden;
+    }
+    textarea::placeholder { color: var(--ink-3); font-weight: 300; }
+    .inp-foot {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding-top: 10px;
+      border-top: 1px solid var(--border);
+      margin-top: 10px;
+    }
+    .inp-hint { font-size: 11px; color: var(--ink-3); }
+    .btn-go {
+      padding: 10px 22px;
+      background: var(--p);
+      color: white;
+      border: none;
+      border-radius: 100px;
+      font-size: 13px;
+      font-weight: 500;
+      font-family: 'Noto Sans KR', sans-serif;
+      cursor: pointer;
+      transition: all 0.18s;
+      box-shadow: 0 2px 10px rgba(124,92,191,0.3);
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .btn-go:hover { background: #6A4DAD; }
+    .btn-go:active { transform: scale(0.97); }
+    .btn-go:disabled { background: #DDD; box-shadow: none; cursor: default; }
+    .spin {
+      width: 14px; height: 14px;
+      border: 2px solid rgba(255,255,255,0.3);
+      border-top-color: white;
+      border-radius: 50%;
+      animation: spin 0.7s linear infinite;
+    }
     @keyframes spin { to { transform: rotate(360deg); } }
 
-    .results { display: flex; flex-direction: column; gap: 12px; opacity: 0; transition: opacity 0.3s; margin-top: 20px; }
-    .results.visible { opacity: 1; }
+    /* ── RESULTS ── */
+    .results { display: flex; flex-direction: column; gap: 10px; opacity: 0; transition: opacity 0.3s; }
+    .results.show { opacity: 1; }
 
-    .card { background: white; border-radius: 16px; overflow: hidden; box-shadow: var(--shadow-sm); }
-    .card-head { padding: 12px 16px; font-size: 11.5px; font-weight: 700; letter-spacing: 0.05em; display: flex; align-items: center; gap: 6px; }
-    .card-body { padding: 14px 16px; font-size: 14px; line-height: 1.75; }
+    .card {
+      background: var(--white);
+      border-radius: var(--r);
+      border: 1px solid var(--border);
+      overflow: hidden;
+    }
+    .card-hd {
+      padding: 12px 16px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 11px;
+      font-weight: 600;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+    }
+    .card-hd-dot {
+      width: 6px; height: 6px;
+      border-radius: 50%;
+      flex-shrink: 0;
+    }
+    .card-bd { padding: 14px 16px; font-size: 14px; line-height: 1.75; color: var(--ink); }
 
-    .card-translation .card-head { background: var(--md-primary-container); color: var(--md-on-primary-container); }
-    .card-correction .card-head { background: var(--md-green-container); color: var(--md-green); }
-    .card-examples .card-head { background: var(--md-blue-container); color: var(--md-blue); }
-    .card-grammar .card-head { background: var(--md-secondary-container); color: var(--md-secondary); }
+    .c-trans .card-hd { background: var(--p-light); color: var(--p); }
+    .c-trans .card-hd-dot { background: var(--p); }
+    .c-corr .card-hd { background: var(--green-bg); color: var(--green); }
+    .c-corr .card-hd-dot { background: var(--green); }
+    .c-ex .card-hd { background: var(--blue-bg); color: var(--blue); }
+    .c-ex .card-hd-dot { background: var(--blue); }
+    .c-gram .card-hd { background: var(--amber-bg); color: var(--amber); }
+    .c-gram .card-hd-dot { background: var(--amber); }
 
-    .placeholder { color: var(--md-outline); font-size: 13px; font-style: italic; }
-    .error-text { color: var(--md-error); font-size: 13px; }
+    .ph { color: var(--ink-3); font-size: 13px; font-style: italic; }
+    .err { color: var(--red); font-size: 13px; }
 
-    /* Correction */
-    .ok-badge { display: flex; align-items: center; gap: 8px; color: var(--md-green); font-weight: 700; font-size: 14px; }
-    .corr-block { margin-bottom: 12px; }
-    .corr-block:last-child { margin-bottom: 0; }
-    .corr-label { font-size: 11px; font-weight: 700; letter-spacing: 0.05em; text-transform: uppercase; padding: 2px 8px; border-radius: 6px; display: inline-block; margin-bottom: 5px; }
-    .lbl-orig { background: #F3EDF7; color: var(--md-secondary); }
-    .lbl-err { background: var(--md-error-container); color: var(--md-error); }
-    .lbl-fix { background: var(--md-green-container); color: var(--md-green); }
-    .lbl-desc { background: var(--md-blue-container); color: var(--md-blue); }
-    .lbl-result { background: var(--md-primary-container); color: var(--md-on-primary-container); }
-    .corr-text { font-size: 14px; line-height: 1.65; padding: 0 4px; margin-bottom: 6px; }
-    .corr-divider { border: none; border-top: 1px solid var(--md-outline-variant); margin: 10px 0; }
+    /* ── CORRECTION ── */
+    .ok-line { display: flex; align-items: center; gap: 8px; color: var(--green); font-weight: 500; font-size: 14px; }
+    .ok-icon { width: 20px; height: 20px; background: var(--green); border-radius: 50%; display: flex; align-items: center; justify-content: center; color: white; font-size: 11px; flex-shrink: 0; }
+    .corr-chip {
+      display: inline-block;
+      font-size: 10px;
+      font-weight: 600;
+      letter-spacing: 0.05em;
+      text-transform: uppercase;
+      padding: 3px 8px;
+      border-radius: 6px;
+      margin-bottom: 4px;
+    }
+    .chip-orig { background: #F0EAF9; color: #6A4DAD; }
+    .chip-err { background: var(--red-bg); color: var(--red); }
+    .chip-fix { background: var(--green-bg); color: var(--green); }
+    .chip-desc { background: var(--blue-bg); color: var(--blue); }
+    .chip-result { background: var(--p-light); color: var(--p); }
+    .corr-val { font-size: 14px; line-height: 1.6; color: var(--ink); margin-bottom: 8px; padding-left: 2px; }
+    .corr-sep { border: none; border-top: 1px solid var(--border); margin: 10px 0; }
+    .corr-final { font-weight: 500; }
 
-    /* Examples */
-    .ex-item { padding: 8px 0; border-bottom: 1px solid var(--md-outline-variant); }
+    /* ── EXAMPLES ── */
+    .ex-item { padding: 10px 0; border-bottom: 1px solid var(--border); }
     .ex-item:last-child { border-bottom: none; padding-bottom: 0; }
-    .ex-es { font-size: 14px; font-weight: 700; }
-    .ex-ko { font-size: 12.5px; color: var(--md-on-surface-variant); margin-top: 3px; }
+    .ex-item:first-child { padding-top: 0; }
+    .ex-es { font-size: 14px; font-weight: 500; color: var(--ink); }
+    .ex-ko { font-size: 12px; color: var(--ink-2); margin-top: 3px; }
 
-    /* Grammar */
-    .g-label { font-size: 11px; font-weight: 700; color: var(--md-on-surface-variant); text-transform: uppercase; letter-spacing: 0.07em; margin: 14px 0 6px; }
-    .g-label:first-child { margin-top: 0; }
-    .g-verb-chip { display: inline-flex; align-items: center; gap: 6px; background: var(--md-secondary-container); color: var(--md-on-primary-container); padding: 5px 14px; border-radius: 20px; font-size: 14px; font-weight: 700; margin-bottom: 8px; }
-    .g-explain { font-size: 13px; line-height: 1.7; margin-bottom: 10px; }
-    .conj-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 4px 10px; margin-bottom: 12px; }
-    .conj-row { display: flex; gap: 8px; align-items: center; padding: 5px 8px; border-radius: 8px; background: var(--md-surface-variant); font-size: 13px; }
-    .conj-pro { color: var(--md-on-surface-variant); min-width: 52px; font-size: 12px; }
-    .conj-form { font-weight: 700; color: var(--md-primary); }
-    .g-notes { font-size: 13px; line-height: 1.7; background: var(--md-primary-container); color: var(--md-on-primary-container); padding: 10px 14px; border-radius: 12px; }
+    /* ── GRAMMAR ── */
+    .gram-sec { font-size: 10px; font-weight: 600; letter-spacing: 0.07em; text-transform: uppercase; color: var(--ink-3); margin: 12px 0 6px; }
+    .gram-sec:first-child { margin-top: 0; }
+    .verb-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      background: var(--amber-bg);
+      border: 1px solid rgba(138,90,0,0.12);
+      padding: 5px 12px;
+      border-radius: 100px;
+      margin-bottom: 8px;
+    }
+    .verb-name { font-family: 'DM Sans', sans-serif; font-weight: 500; font-size: 15px; color: var(--amber); }
+    .verb-mean { font-size: 12px; color: var(--ink-2); }
+    .gram-exp { font-size: 13px; line-height: 1.7; color: var(--ink-2); margin-bottom: 10px; }
+    .conj-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 5px; margin-bottom: 12px; }
+    .conj-cell {
+      background: #FAFAFA;
+      border: 1px solid var(--border);
+      border-radius: var(--r-xs);
+      padding: 7px 10px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .conj-pro { font-size: 11px; color: var(--ink-3); }
+    .conj-form { font-size: 13px; font-weight: 500; color: var(--p); font-family: 'DM Sans', sans-serif; }
+    .gram-note {
+      background: linear-gradient(135deg, #F3EEFF 0%, #EDF4FF 100%);
+      border-radius: var(--r-sm);
+      padding: 12px 14px;
+      font-size: 13px;
+      line-height: 1.7;
+      color: var(--ink-2);
+      border: 1px solid rgba(124,92,191,0.1);
+    }
   </style>
 </head>
 <body>
 
-<header class="header">
-  <div class="header-icon">🇪🇸</div>
-  <div>
-    <div class="header-title">jOYA</div>
-    <div class="header-sub">스페인어 공부 번역기</div>
-
+<header class="hd">
+  <div class="hd-left">
+    <div class="hd-logo">jO</div>
+    <div>
+      <div class="hd-name">jOYA</div>
+      <div class="hd-sub">스페인어 번역기</div>
+    </div>
   </div>
-  <span class="header-version">ver 1.0 (20260510)</span>
+  <span class="hd-ver">v1.0 · 20260510</span>
 </header>
 
 <main class="main">
-  <div class="segment-wrap">
-    <button class="seg-btn active" id="btn-es" onclick="setMode('es')"><span class="lang-code">ES</span> 스페인어</button>
-    <span class="seg-arrow">⇄</span>
-    <button class="seg-btn" id="btn-ko" onclick="setMode('ko')"><span class="lang-code">KR</span> 한국어</button>
+
+  <div class="toggle">
+    <button class="tog-btn on" id="btn-es" onclick="setMode('es')">
+      <span class="tog-badge">ES</span> 스페인어
+    </button>
+    <span class="tog-arrow">&#8644;</span>
+    <button class="tog-btn" id="btn-ko" onclick="setMode('ko')">
+      <span class="tog-badge">KR</span> 한국어
+    </button>
   </div>
 
-  <div class="input-card">
-    <textarea id="input-text" placeholder="스페인어 문장을 입력하세요" rows="2"></textarea>
-    <div class="input-footer">
-      <span class="input-hint">Enter 번역 · Shift+Enter 줄바꿈</span>
-      <button class="go-btn" id="go-btn" onclick="doTranslate()"><span>번역</span></button>
+  <div class="inp-wrap">
+    <textarea id="ta" placeholder="스페인어 문장을 입력하세요" rows="2"></textarea>
+    <div class="inp-foot">
+      <span class="inp-hint">Enter 번역 &middot; Shift+Enter 줄바꿈</span>
+      <button class="btn-go" id="btn-go" onclick="doTranslate()">번역</button>
     </div>
   </div>
 
   <div class="results" id="results">
-    <div class="card card-translation">
-      <div class="card-head">📖 해석 (원문)</div>
-      <div class="card-body" id="res-translation"><span class="placeholder">번역 결과가 여기 표시됩니다</span></div>
+    <div class="card c-trans">
+      <div class="card-hd"><span class="card-hd-dot"></span>해석</div>
+      <div class="card-bd" id="r-trans"><span class="ph">번역 결과가 여기 표시됩니다</span></div>
     </div>
-    <div class="card card-correction">
-      <div class="card-head">✏️ 문장 교정</div>
-      <div class="card-body" id="res-correction"><span class="placeholder">교정 내용이 여기 표시됩니다</span></div>
+    <div class="card c-corr">
+      <div class="card-hd"><span class="card-hd-dot"></span>문장 교정</div>
+      <div class="card-bd" id="r-corr"><span class="ph">교정 내용이 여기 표시됩니다</span></div>
     </div>
-    <div class="card card-examples">
-      <div class="card-head">💬 예제</div>
-      <div class="card-body" id="res-examples"><span class="placeholder">관련 예제 문장이 여기 표시됩니다</span></div>
+    <div class="card c-ex">
+      <div class="card-hd"><span class="card-hd-dot"></span>예제</div>
+      <div class="card-bd" id="r-ex"><span class="ph">관련 예제 문장이 여기 표시됩니다</span></div>
     </div>
-    <div class="card card-grammar">
-      <div class="card-head">🔤 문법 상세 (동사 변환)</div>
-      <div class="card-body" id="res-grammar"><span class="placeholder">동사 변환 및 문법 설명이 여기 표시됩니다</span></div>
+    <div class="card c-gram">
+      <div class="card-hd"><span class="card-hd-dot"></span>문법 &amp; 동사 변환</div>
+      <div class="card-bd" id="r-gram"><span class="ph">동사 변환 및 문법 설명이 여기 표시됩니다</span></div>
     </div>
   </div>
+
 </main>
 
 <script>
-  let mode = 'es';
-  const ta = document.getElementById('input-text');
+var mode = 'es';
+var ta = document.getElementById('ta');
 
-  // Auto-resize
-  ta.addEventListener('input', () => {
-    ta.style.height = 'auto';
-    ta.style.height = ta.scrollHeight + 'px';
-  });
+ta.addEventListener('input', function() {
+  ta.style.height = 'auto';
+  ta.style.height = ta.scrollHeight + 'px';
+});
 
-  function setMode(m) {
-    mode = m;
-    document.getElementById('btn-es').classList.toggle('active', m === 'es');
-    document.getElementById('btn-ko').classList.toggle('active', m === 'ko');
-    ta.placeholder = m === 'es' ? '스페인어 문장을 입력하세요' : '한국어 문장을 입력하세요';
+function setMode(m) {
+  mode = m;
+  document.getElementById('btn-es').classList.toggle('on', m === 'es');
+  document.getElementById('btn-ko').classList.toggle('on', m === 'ko');
+  ta.placeholder = m === 'es' ? '스페인어 문장을 입력하세요' : '한국어 문장을 입력하세요';
+}
+
+function setLoading(on) {
+  var b = document.getElementById('btn-go');
+  b.disabled = on;
+  b.innerHTML = on ? '<div class="spin"></div>' : '번역';
+}
+
+function setText(id, t) { document.getElementById(id).textContent = t; }
+
+function renderCorr(c) {
+  var el = document.getElementById('r-corr');
+  if (!c || (c.errors && c.errors.length === 0)) {
+    el.innerHTML = '<div class="ok-line"><div class="ok-icon">&#10003;</div>자연스러운 문장입니다</div>';
+    return;
   }
-
-  function setLoading(on) {
-    const btn = document.getElementById('go-btn');
-    btn.disabled = on;
-    btn.innerHTML = on ? '<div class="spinner"></div>' : '<span>번역</span>';
+  if (typeof c === 'string') { el.textContent = c; return; }
+  var h = '';
+  if (c.original) {
+    h += '<div><span class="corr-chip chip-orig">원문</span><div class="corr-val">' + c.original + '</div></div>';
   }
-
-  function setText(id, text) { document.getElementById(id).textContent = text; }
-
-  function renderCorrection(c) {
-    const el = document.getElementById('res-correction');
-    if (!c || (c.errors && c.errors.length === 0)) {
-      el.innerHTML = `<div class="ok-badge">✅ 자연스러운 문장입니다</div>`;
-      return;
+  if (c.errors && c.errors.length) {
+    for (var i = 0; i < c.errors.length; i++) {
+      var e = c.errors[i];
+      h += '<hr class="corr-sep">';
+      h += '<div><span class="corr-chip chip-err">오류</span><div class="corr-val">' + e.error + '</div>';
+      h += '<span class="corr-chip chip-fix">수정</span><div class="corr-val">' + e.fix + '</div>';
+      h += '<span class="corr-chip chip-desc">설명</span><div class="corr-val">' + e.desc + '</div></div>';
     }
-    if (typeof c === 'string') { el.textContent = c; return; }
-    let html = '';
-    if (c.original) {
-      html += `<div class="corr-block"><span class="corr-label lbl-orig">원문</span><div class="corr-text">${c.original}</div></div>`;
-    }
-    if (c.errors && c.errors.length) {
-      html += `<hr class="corr-divider">`;
-      c.errors.forEach((err, i) => {
-        html += `<div class="corr-block">
-          <span class="corr-label lbl-err">오류</span><div class="corr-text">${err.error}</div>
-          <span class="corr-label lbl-fix">수정</span><div class="corr-text">${err.fix}</div>
-          <span class="corr-label lbl-desc">설명</span><div class="corr-text">${err.desc}</div>
-        </div>`;
-        if (i < c.errors.length - 1) html += `<hr class="corr-divider">`;
-      });
-    }
-    if (c.result) {
-      html += `<hr class="corr-divider"><div class="corr-block"><span class="corr-label lbl-result">최종 교정문</span><div class="corr-text" style="font-weight:700">${c.result}</div></div>`;
-    }
-    el.innerHTML = html;
   }
-
-  function renderExamples(examples) {
-    const el = document.getElementById('res-examples');
-    if (!examples || !examples.length) { el.innerHTML = '<span class="placeholder">예제 없음</span>'; return; }
-    el.innerHTML = examples.map(e => `<div class="ex-item"><div class="ex-es">${e.es}</div><div class="ex-ko">${e.ko}</div></div>`).join('');
+  if (c.result) {
+    h += '<hr class="corr-sep"><div><span class="corr-chip chip-result">최종 교정문</span><div class="corr-val corr-final">' + c.result + '</div></div>';
   }
+  el.innerHTML = h;
+}
 
-  function renderGrammar(data) {
-    const el = document.getElementById('res-grammar');
-    let html = '';
-    if (data && data.verbs && data.verbs.length) {
-      data.verbs.forEach(v => {
-        html += `<p class="g-label">동사</p>`;
-        html += `<div class="g-verb-chip">${v.infinitive} <span style="font-weight:400;font-size:12px">${v.meaning}</span></div>`;
-        html += `<p class="g-explain">${v.explanation}</p>`;
-        if (v.conjugations && v.conjugations.length) {
-          html += `<div class="conj-grid">`;
-          v.conjugations.forEach(c => {
-            html += `<div class="conj-row"><span class="conj-pro">${c.pronoun}</span><span class="conj-form">${c.form}</span></div>`;
-          });
-          html += `</div>`;
+function renderEx(arr) {
+  var el = document.getElementById('r-ex');
+  if (!arr || !arr.length) { el.innerHTML = '<span class="ph">예제 없음</span>'; return; }
+  var h = '';
+  for (var i = 0; i < arr.length; i++) {
+    h += '<div class="ex-item"><div class="ex-es">' + arr[i].es + '</div><div class="ex-ko">' + arr[i].ko + '</div></div>';
+  }
+  el.innerHTML = h;
+}
+
+function renderGram(d) {
+  var el = document.getElementById('r-gram');
+  var h = '';
+  if (d && d.verbs && d.verbs.length) {
+    for (var i = 0; i < d.verbs.length; i++) {
+      var v = d.verbs[i];
+      h += '<p class="gram-sec">동사</p>';
+      h += '<div class="verb-pill"><span class="verb-name">' + v.infinitive + '</span><span class="verb-mean">' + v.meaning + '</span></div>';
+      h += '<p class="gram-exp">' + v.explanation + '</p>';
+      if (v.conjugations && v.conjugations.length) {
+        h += '<div class="conj-grid">';
+        for (var j = 0; j < v.conjugations.length; j++) {
+          h += '<div class="conj-cell"><span class="conj-pro">' + v.conjugations[j].pronoun + '</span><span class="conj-form">' + v.conjugations[j].form + '</span></div>';
         }
-      });
-    }
-    if (data && data.notes) {
-      html += `<p class="g-label">문법 노트</p><div class="g-notes">${data.notes}</div>`;
-    }
-    el.innerHTML = html || '<span class="placeholder">동사 정보 없음</span>';
-  }
-
-  async function doTranslate() {
-    const rawText = ta.value.trim();
-    if (!rawText) return;
-
-    // 이모지 보존 처리
-    const emojiMap = {};
-    let idx = 0;
-    const safeText = rawText.replace(/(\p{Emoji_Presentation}|\p{Extended_Pictographic})/gu, match => {
-      const key = `EMOJI${idx++}`;
-      emojiMap[key] = match;
-      return key;
-    });
-
-    setLoading(true);
-    document.getElementById('results').classList.add('visible');
-    setText('res-translation', '분석 중...');
-    document.getElementById('res-correction').innerHTML = '<span class="placeholder">분석 중...</span>';
-    document.getElementById('res-examples').innerHTML = '<span class="placeholder">로딩 중...</span>';
-    document.getElementById('res-grammar').innerHTML = '<span class="placeholder">로딩 중...</span>';
-
-    const isES = mode === 'es';
-    const esPrompt = `You are a Spanish tutor for Korean learners. Respond ONLY with a valid JSON object. No markdown, no code fences, no explanation outside JSON.
-STRICT RULES:
-1. ALL Korean text fields must use ONLY Korean Hangul characters (가-힣). NEVER use Chinese characters (漢字), Japanese characters (ひらがな/カタカナ), Russian (Кириллица), or any non-Korean script. This is the most important rule.
-2. Write Korean words in pure Hangul. For example: 시청 (NOT 市廳), 도서관 (NOT 圖書館).
-3. For "correction": do NOT just fix grammar errors. Rewrite using the most natural, commonly used Spanish expressions native speakers actually use. Explain in Korean.
-4. Never output garbled or mixed-script text.
-
-User inputs a Spanish sentence. Return this exact JSON:
-{
-  "translation": "자연스러운 한국어 번역",
-  "correction": {
-    "original": "원문 스페인어",
-    "errors": [{"error": "오류나 어색한 표현 설명 (한국어)", "fix": "원어민이 실제로 쓰는 자연스러운 표현으로 수정", "desc": "왜 이 표현이 더 자연스러운지 한국어로 설명"}],
-    "result": "원어민이 실제로 쓰는 가장 자연스러운 스페인어 문장"
-  },
-  "examples": [
-    {"es": "관련 스페인어 예문", "ko": "한국어 번역"},
-    {"es": "관련 스페인어 예문 2", "ko": "한국어 번역 2"},
-    {"es": "관련 스페인어 예문 3", "ko": "한국어 번역 3"}
-  ],
-  "grammar": {
-    "verbs": [{
-      "infinitive": "동사원형",
-      "meaning": "한국어 뜻",
-      "explanation": "이 문장에서 사용된 시제/법/인칭을 한국어로 설명",
-      "conjugations": [
-        {"pronoun": "yo", "form": "활용형"},
-        {"pronoun": "tú", "form": "활용형"},
-        {"pronoun": "él/ella", "form": "활용형"},
-        {"pronoun": "nosotros", "form": "활용형"},
-        {"pronoun": "vosotros", "form": "활용형"},
-        {"pronoun": "ellos", "form": "활용형"}
-      ]
-    }],
-    "notes": "한국어로만 작성된 문법 노트. 절대 일본어, 중국어, 러시아어 등 다른 언어 사용 금지."
-  }
-}`;
-    const koPrompt = `You are a Spanish tutor for Korean learners. Respond ONLY with a valid JSON object. No markdown, no code fences, no explanation outside JSON.
-STRICT RULES:
-1. ALL Korean text fields must use ONLY Korean Hangul characters (가-힣). NEVER use Chinese characters (漢字), Japanese characters (ひらがな/カタカナ), Russian (Кириллица), or any non-Korean script. This is the most important rule.
-2. Write Korean words in pure Hangul. For example: 시청 (NOT 市廳), 도서관 (NOT 圖書館).
-3. Do NOT correct the Korean input. Only translate it to Spanish.
-4. Never output garbled or mixed-script text.
-
-User inputs a Korean sentence. Translate it to natural Spanish. Return this exact JSON:
-{
-  "translation": "자연스러운 스페인어 번역",
-  "correction": {
-    "original": "원문 한국어",
-    "errors": [],
-    "result": "원문 한국어 그대로 (한국어 교정 없음)"
-  },
-  "examples": [
-    {"es": "관련 스페인어 예문", "ko": "한국어 번역"},
-    {"es": "관련 스페인어 예문 2", "ko": "한국어 번역 2"},
-    {"es": "관련 스페인어 예문 3", "ko": "한국어 번역 3"}
-  ],
-  "grammar": {
-    "verbs": [{
-      "infinitive": "동사원형",
-      "meaning": "한국어 뜻",
-      "explanation": "이 문장에서 사용된 시제/법/인칭을 한국어로 설명",
-      "conjugations": [
-        {"pronoun": "yo", "form": "활용형"},
-        {"pronoun": "tú", "form": "활용형"},
-        {"pronoun": "él/ella", "form": "활용형"},
-        {"pronoun": "nosotros", "form": "활용형"},
-        {"pronoun": "vosotros", "form": "활용형"},
-        {"pronoun": "ellos", "form": "활용형"}
-      ]
-    }],
-    "notes": "한국어로만 작성된 문법 노트. 절대 일본어, 중국어, 러시아어 등 다른 언어 사용 금지."
-  }
-}`;
-    const systemPrompt = isES ? esPrompt : koPrompt;
-
-    try {
-      const resp = await fetch('/.netlify/functions/translate', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          system: systemPrompt,
-          messages: [{ role: 'user', content: safeText }]
-        })
-      });
-
-      const data = await resp.json();
-      if (data.error) throw new Error(data.error);
-
-      let raw = data.content.map(b => b.text || '').join('');
-      Object.entries(emojiMap).forEach(([k, v]) => { raw = raw.split(k).join(v); });
-
-      // JSON 추출 및 안전한 파싱
-      let clean = raw.replace(/```json|```/g, '').trim();
-      // JSON 블록만 추출 (중괄호 기준)
-      const jsonStart = clean.indexOf('{');
-      const jsonEnd = clean.lastIndexOf('}');
-      if (jsonStart !== -1 && jsonEnd !== -1) {
-        clean = clean.substring(jsonStart, jsonEnd + 1);
+        h += '</div>';
       }
-      // 제어문자 제거 (줄바꿈은 유지)
-      clean = clean.replace(/[ --]/g, '');
-      const parsed = JSON.parse(clean);
-
-      setText('res-translation', parsed.translation || '-');
-      renderCorrection(parsed.correction);
-      renderExamples(parsed.examples || []);
-      renderGrammar(parsed.grammar || {});
-
-    } catch (e) {
-      setText('res-translation', '오류: ' + e.message);
-      document.getElementById('res-correction').innerHTML = '<span class="error-text">결과를 불러올 수 없습니다</span>';
-      document.getElementById('res-examples').innerHTML = '<span class="error-text">결과를 불러올 수 없습니다</span>';
-      document.getElementById('res-grammar').innerHTML = '<span class="error-text">결과를 불러올 수 없습니다</span>';
-    } finally {
-      setLoading(false);
     }
   }
+  if (d && d.notes) {
+    h += '<p class="gram-sec">문법 노트</p><div class="gram-note">' + d.notes + '</div>';
+  }
+  el.innerHTML = h || '<span class="ph">동사 정보 없음</span>';
+}
 
-  ta.addEventListener('keydown', e => {
-    if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); doTranslate(); }
-  });
+function getPrompt(isES, text) {
+  var rule = 'STRICT: All Korean fields must use ONLY Korean Hangul. NO Chinese characters (漢字), NO Japanese, NO mixed scripts. Write 시청 not 市廳.\n\n';
+  var json = '{"translation":"번역","correction":{"original":"원문","errors":[{"error":"오류(한국어)","fix":"수정","desc":"설명(한국어)"}],"result":"교정문"},"examples":[{"es":"예문","ko":"번역"},{"es":"예문2","ko":"번역2"},{"es":"예문3","ko":"번역3"}],"grammar":{"verbs":[{"infinitive":"원형","meaning":"뜻","explanation":"설명(한국어)","conjugations":[{"pronoun":"yo","form":""},{"pronoun":"tú","form":""},{"pronoun":"él/ella","form":""},{"pronoun":"nosotros","form":""},{"pronoun":"vosotros","form":""},{"pronoun":"ellos","form":""}]}],"notes":"노트(한국어)"}}';
+  if (isES) {
+    return rule + 'Spanish tutor for Korean learners. Respond ONLY with valid JSON, no markdown.\nUser inputs Spanish. Return: ' + json + '\nInput: ' + text;
+  } else {
+    return rule + 'Spanish tutor for Korean learners. Respond ONLY with valid JSON, no markdown.\nTranslate Korean to Spanish. Do NOT correct Korean. Set errors:[]. Return: ' + json + '\nInput: ' + text;
+  }
+}
+
+async function doTranslate() {
+  var raw = ta.value.trim();
+  if (!raw) return;
+  setLoading(true);
+  document.getElementById('results').classList.add('show');
+  setText('r-trans', '분석 중...');
+  document.getElementById('r-corr').innerHTML = '<span class="ph">분석 중...</span>';
+  document.getElementById('r-ex').innerHTML = '<span class="ph">로딩 중...</span>';
+  document.getElementById('r-gram').innerHTML = '<span class="ph">로딩 중...</span>';
+
+  try {
+    var resp = await fetch('/.netlify/functions/translate', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ system: getPrompt(mode === 'es', raw), messages: [{ role: 'user', content: raw }] })
+    });
+    var data = await resp.json();
+    if (data.error) throw new Error(data.error);
+
+    var txt = data.content.map(function(b) { return b.text || ''; }).join('');
+    var s = txt.indexOf('{'), e = txt.lastIndexOf('}');
+    if (s !== -1 && e !== -1) txt = txt.substring(s, e + 1);
+    txt = txt.replace(/[\x00-\x08\x0B\x0C\x0E-\x1F\x7F]/g, '');
+    var p = JSON.parse(txt);
+
+    setText('r-trans', p.translation || '-');
+    renderCorr(p.correction);
+    renderEx(p.examples || []);
+    renderGram(p.grammar || {});
+  } catch(err) {
+    setText('r-trans', '오류: ' + err.message);
+    document.getElementById('r-corr').innerHTML = '<span class="err">결과를 불러올 수 없습니다</span>';
+    document.getElementById('r-ex').innerHTML = '<span class="err">결과를 불러올 수 없습니다</span>';
+    document.getElementById('r-gram').innerHTML = '<span class="err">결과를 불러올 수 없습니다</span>';
+  } finally {
+    setLoading(false);
+  }
+}
+
+ta.addEventListener('keydown', function(e) {
+  if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); doTranslate(); }
+});
 </script>
 </body>
 </html>
