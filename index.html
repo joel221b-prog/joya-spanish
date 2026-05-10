@@ -326,21 +326,19 @@ function getESPrompt(text) {
 }
 
 function getKOPrompt(text) {
-  return RULE +
-    'Spanish tutor for Korean learners. JSON only, no markdown.\n' +
-    'Step 1: Translate Korean input to Spanish.\n' +
-    'Step 2: Suggest a more natural SPANISH expression a native speaker would use.\n' +
-    'Step 3: Analyze the SPANISH grammar (not Korean).\n' +
-    'ALL description fields must be in Korean Hangul. translation and native_text must be in Spanish.\n' +
-    'Return:\n' +
-    '{"translation":"[SPANISH translation here]",' +
-    '"native_text":"[More natural SPANISH expression here - must be Spanish, not Korean]",' +
-    '"native_tip":"[한국어로 차이점 설명 20자이내]",' +
-    '"grammar":[' +
-    '{"tag":"문법표현","desc":"[스페인어 문법 설명 한국어로]"},' +
-    '{"tag":"시제","desc":"[스페인어 시제 설명 한국어로]"},' +
-    '{"tag":"표현법","desc":"[스페인어 표현 설명 한국어로]"}],' +
-    '"key_verb":{"infinitive":"[Spanish infinitive]","meaning":"[한국어뜻]",' +
+  return 'CRITICAL RULES:\n' +
+    '1. "translation" field: MUST be written in Spanish using Latin alphabet (e.g. Hace viento.). NEVER use Korean characters here.\n' +
+    '2. "native_text" field: MUST be written in Spanish using Latin alphabet. NEVER use Korean characters here.\n' +
+    '3. "tag", "desc", "native_tip", "meaning" fields: write in Korean Hangul.\n' +
+    '4. "infinitive", "pronoun", "form" fields: write in Spanish Latin alphabet.\n\n' +
+    'Spanish tutor. JSON only, no markdown.\n' +
+    'Translate this Korean text to Spanish, then analyze the Spanish grammar.\n' +
+    'Return this exact JSON structure:\n' +
+    '{"translation":"[Spanish text here using Latin letters]",' +
+    '"native_text":"[More natural Spanish expression using Latin letters]",' +
+    '"native_tip":"[한국어로 차이점 설명]",' +
+    '"grammar":[{"tag":"문법표현","desc":"한국어설명"},{"tag":"시제","desc":"한국어설명"},{"tag":"표현법","desc":"한국어설명"}],' +
+    '"key_verb":{"infinitive":"Spanish verb","meaning":"한국어뜻",' +
     '"conjugations":[{"pronoun":"yo","form":""},{"pronoun":"tú","form":""},{"pronoun":"él/ella","form":""},{"pronoun":"nosotros","form":""},{"pronoun":"vosotros","form":""},{"pronoun":"ellos","form":""}]}}\n' +
     'Korean input: ' + text;
 }
