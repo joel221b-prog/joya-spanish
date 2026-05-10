@@ -300,10 +300,10 @@ async function fetchGrammarAndVerbs(isES, text, esTranslation) {
       'Return: {"analysis":[],"verbs":[{"infinitive":"Spanish verb","meaning":"한국어뜻","explanation":"한국어설명20자이내","conjugations":' + conj + '}],"notes":""}\nSpanish input: ' + target;
     return await callAPI(p, target);
   } else {
-    var p = RULE + 'Spanish tutor. JSON only. Concise (max 20 chars per Korean field).\n' +
-      'Analyze this SPANISH sentence. Korean explanations only. Spanish infinitive only for verbs.\n' +
-      'Return: {"analysis":[{"tag":"주어","desc":"한국어"},{"tag":"동사","desc":"한국어"},{"tag":"시제","desc":"한국어"}],' +
-      '"verbs":[{"infinitive":"Spanish verb","meaning":"한국어뜻","explanation":"한국어","conjugations":' + conj + '}],"notes":"한국어30자이내"}\nSpanish input: ' + target;
+    var p = RULE + 'Spanish tutor. JSON only. Korean explanations only.\n' +
+      'Analyze this Spanish sentence. Return EXACTLY 3 analysis items (주어, 동사, 시제 only). Spanish infinitive only.\n' +
+      'Return: {"analysis":[{"tag":"주어","desc":"주어설명20자이내"},{"tag":"동사","desc":"동사설명20자이내"},{"tag":"시제","desc":"시제설명20자이내"}],' +
+      '"verbs":[{"infinitive":"Spanish","meaning":"한국어뜻","explanation":"한국어설명20자이내","conjugations":' + conj + '}],"notes":"핵심문법30자이내"}\nSpanish input: ' + target;
     return await callAPI(p, target);
   }
 }
@@ -428,6 +428,7 @@ async function doTranslate(mode) {
       esTranslation = await fetchTranslation(false, raw);
       var el = document.getElementById('r-trans-ko');
       el.style.whiteSpace = 'pre-wrap';
+      el.style.wordBreak = 'break-word';
       el.textContent = esTranslation;
     } catch(e) {
       setText('r-trans-ko', '오류: ' + e.message);
