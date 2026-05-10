@@ -348,7 +348,16 @@ User inputs a Korean sentence. Translate it to natural Spanish. Return this exac
       let raw = data.content.map(b => b.text || '').join('');
       Object.entries(emojiMap).forEach(([k, v]) => { raw = raw.split(k).join(v); });
 
-      const clean = raw.replace(/```json|```/g, '').trim();
+      // JSON 추출 및 안전한 파싱
+      let clean = raw.replace(/```json|```/g, '').trim();
+      // JSON 블록만 추출 (중괄호 기준)
+      const jsonStart = clean.indexOf('{');
+      const jsonEnd = clean.lastIndexOf('}');
+      if (jsonStart !== -1 && jsonEnd !== -1) {
+        clean = clean.substring(jsonStart, jsonEnd + 1);
+      }
+      // 제어문자 제거 (줄바꿈은 유지)
+      clean = clean.replace(/[ --]/g, '');
       const parsed = JSON.parse(clean);
 
       setText('res-translation', parsed.translation || '-');
