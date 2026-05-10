@@ -126,11 +126,11 @@
     .conj-verb-title{font-family:'DM Sans',sans-serif;font-size:24px;font-weight:500;color:var(--ink)}
     .conj-verb-sub{font-size:12px;color:var(--ink-3);margin-top:3px}
     .conj-meanings-row{display:flex;gap:6px;margin-top:8px;flex-wrap:wrap}
-    .conj-mean-badge{display:inline-block;background:var(--teal-bg);color:var(--teal);font-size:13px;font-weight:500;padding:4px 12px;border-radius:100px}
+    .conj-mean-badge{display:inline-block;background:var(--teal-bg);color:var(--teal);font-size:13px;font-weight:500;padding:4px 12px;border-radius:100px;border:1px solid rgba(26,107,90,0.15)}
     .nonfinite-row{display:flex;gap:10px;margin-top:12px;flex-wrap:wrap}
-    .nonfinite-item{display:flex;align-items:center;gap:6px;background:var(--teal-bg);border:1px solid rgba(26,107,90,0.12);padding:6px 12px;border-radius:100px}
-    .nonfinite-label{font-size:10px;font-weight:600;color:var(--teal);text-transform:uppercase}
-    .nonfinite-form{font-size:14px;font-weight:500;color:var(--ink);font-family:'DM Sans',sans-serif}
+    .nonfinite-item{display:flex;align-items:center;gap:6px;background:var(--teal);border:1px solid var(--teal);padding:6px 12px;border-radius:100px}
+    .nonfinite-label{font-size:10px;font-weight:600;color:rgba(255,255,255,0.8);text-transform:uppercase}
+    .nonfinite-form{font-size:14px;font-weight:500;color:white;font-family:'DM Sans',sans-serif}
     .tense-block{border-bottom:1px solid var(--border)}
     .tense-block:last-child{border-bottom:none}
     .tense-hd{padding:12px 16px 8px;display:flex;align-items:center;gap:8px}
@@ -305,16 +305,13 @@ async function fetchGrammarAndVerbs(isES, text, esTranslation) {
     return await callAPI(p, target);
   } else {
     var p = RULE + 'Spanish tutor. JSON only. All explanations in Korean (한국어).\n' +
-      'Analyze the KEY GRAMMAR EXPRESSIONS in this Spanish sentence.\n' +
-      'Focus on: verb tense/mood, ser vs estar, por vs para, subjunctive, reflexive verbs, prepositions, idioms, etc.\n' +
-      'Pick the 2-4 most important grammar points. Be specific and educational.\n' +
-      'Return: {"analysis":[' +
-      '{"tag":"문법표현","desc":"구체적인 문법 설명 (예: poder+동사원형 = ~할 수 있다)"},' +
-      '{"tag":"시제","desc":"사용된 시제와 이유 설명"},' +
-      '{"tag":"표현법","desc":"이 표현을 쓰는 상황이나 뉘앙스"}],' +
-      '"verbs":[{"infinitive":"실제스페인어동사원형","meaning":"한국어뜻","explanation":"이 문장에서의 시제와 용법","conjugations":' + conj + '}],' +
-      '"notes":"이 문장에서 꼭 알아야 할 핵심 문법 한 문장"}\n' +
-      'Spanish input: ' + target;
+      'Analyze 2-3 key grammar expressions in this Spanish text. Korean explanations only.\n' +
+      'Focus on verb tense/mood, ser/estar, por/para, reflexive verbs, subjunctive, idioms.\n' +
+      'IMPORTANT: analysis array must NOT be empty. Always include at least 2 items.\n' +
+      'Return: {"analysis":[{"tag":"문법표현","desc":"실제단어포함설명"},{"tag":"시제","desc":"시제와이유"},{"tag":"표현법","desc":"뉘앙스"}],' +
+      '"verbs":[{"infinitive":"스페인어원형","meaning":"한국어뜻","explanation":"용법설명","conjugations":' + conj + '}],' +
+      '"notes":"핵심포인트"}\n' +
+      'Spanish: ' + target;
     return await callAPI(p, target);
   }
 }
