@@ -452,18 +452,13 @@ async function doConjugate() {
   var r6 = '[{"pronoun":"yo","form":""},{"pronoun":"tu","form":""},{"pronoun":"el/ella","form":""},{"pronoun":"nosotros","form":""},{"pronoun":"vosotros","form":""},{"pronoun":"ellos","form":""}]';
   var r2 = '[{"pronoun":"tu","form":""},{"pronoun":"vosotros","form":""}]';
 
-  var pInfo = RULE + 'Spanish conjugation expert. JSON only.
-' +
-    'Return basic info for this Spanish verb:
-' +
-    '{"verb":"infinitive","meanings":["뜻1","뜻2","뜻3"],"verb_type":"동사유형(한국어)","nonfinite":{"past_participle":"형태","gerund":"형태"}}
-' +
+  var pInfo = RULE + 'Spanish conjugation expert. JSON only.\n' +
+    'Return basic info for this Spanish verb:\n' +
+    '{"verb":"infinitive","meanings":["뜻1","뜻2","뜻3"],"verb_type":"동사유형(한국어)","nonfinite":{"past_participle":"형태","gerund":"형태"}}\n' +
     'Verb: ' + verb;
 
-  var pTenses = RULE + 'Spanish conjugation expert. JSON only.
-' +
-    'Conjugate this Spanish verb for all tenses:
-' +
+  var pTenses = RULE + 'Spanish conjugation expert. JSON only.\n' +
+    'Conjugate this Spanish verb for all tenses:\n' +
     '{"tenses":[' +
     '{"tense":"Presente","name_ko":"현재형","rows":' + r6 + '},' +
     '{"tense":"Pret.Indefinido","name_ko":"단순과거","rows":' + r6 + '},' +
@@ -472,8 +467,7 @@ async function doConjugate() {
     '{"tense":"Condicional","name_ko":"조건법","rows":' + r6 + '},' +
     '{"tense":"Pret.Perfecto","name_ko":"현재완료","rows":' + r6 + '},' +
     '{"tense":"Subjuntivo","name_ko":"현재접속법","rows":' + r6 + '},' +
-    '{"tense":"Imperativo","name_ko":"명령문","rows":' + r2 + '}]}
-' +
+    '{"tense":"Imperativo","name_ko":"명령문","rows":' + r2 + '}]}\n' +
     'Verb: ' + verb;
 
   // 뼈대 먼저 표시
