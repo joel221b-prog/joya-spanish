@@ -271,11 +271,11 @@ async function callAPI(prompt, input) {
 
 // 번역 (해석)
 async function fetchTranslation(isES, text) {
-  var p = RULE + 'You are a translator. Respond with ONLY a JSON object. No other text, no repetition of the input.\n' +
-    (isES
-      ? 'Translate the following Spanish text to Korean. Output ONLY the translation, not the original. Return: {"translation":"한국어번역만"}'
-      : 'Translate the following Korean text to Spanish. Output ONLY the translation, not the original. Return: {"translation":"Spanish translation only"}') +
-    '\nPreserve line breaks. Do NOT repeat the source text in the output.\nText to translate: ' + text;
+  var lineCount = text.split('\n').length;
+  var p = isES
+    ? 'Translate this Spanish text to Korean. Return JSON: {"translation":"<Korean translation here>"}. The translation field must contain ONLY the Korean translation, written exactly ' + lineCount + ' line(s). Do not add any extra lines or repeat content.'
+    : 'Translate this Korean text to Spanish. Return JSON: {"translation":"<Spanish translation here>"}. The translation field must contain ONLY the Spanish translation, written exactly ' + lineCount + ' line(s). Do not add any extra lines or repeat content.';
+  p += '\nSource text (do NOT include this in output):\n' + text;
   var r = await callAPI(p, text);
   var t = r.translation || '-';
   t = t.replace(/\\n/g, '\n');
