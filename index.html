@@ -160,6 +160,8 @@
     <textarea id="ta-es" placeholder="스페인어 문장을 입력하세요" rows="2"></textarea>
     <div class="inp-foot">
       <span class="inp-hint">Enter 번역 &middot; Shift+Enter 줄바꿈</span>
+      <span class="line-hint" style="display:none;font-size:11px;color:var(--red)">최대 10줄까지 입력 가능해요</span>
+      <span class="line-hint" style="display:none;font-size:11px;color:var(--red)">최대 10줄까지 입력 가능해요</span>
       <button class="btn-go" id="btn-es" onclick="doTranslate('es')">번역</button>
     </div>
   </div>
@@ -205,11 +207,28 @@ function switchTab(t) {
   });
 }
 
+var MAX_LINES = 10;
+
+function checkLines(el) {
+  var lines = el.value.split('\n').length;
+  var hint = el.closest('.inp-wrap').querySelector('.line-hint');
+  if (lines > MAX_LINES) {
+    hint.style.display = 'block';
+    el.style.borderColor = 'var(--red)';
+    return false;
+  } else {
+    hint.style.display = 'none';
+    el.style.borderColor = '';
+    return true;
+  }
+}
+
 ['ta-es','ta-ko'].forEach(function(id) {
   var el = document.getElementById(id);
   el.addEventListener('input', function() {
     el.style.height = 'auto';
     el.style.height = el.scrollHeight + 'px';
+    checkLines(el);
   });
   el.addEventListener('keydown', function(e) {
     if (e.key === 'Enter' && !e.shiftKey) {
@@ -227,6 +246,10 @@ function setText(id, t) { document.getElementById(id).textContent = t; }
 
 function setHTML(id, h) { document.getElementById(id).innerHTML = h; }
 
+function stripSpecial(text) {
+  return text.replace(/[\u{1F300}-\u{1F9FF}|\u{2600}-\u{27BF}|\u{FE00}-\u{FEFF}|\u{1F000}-\u{1FFFF}]/gu, '').trim();
+}
+
 async function callAPI(prompt, input) {
   var resp = await fetch('/.netlify/functions/translate', {
     method: 'POST',
@@ -236,23 +259,38 @@ async function callAPI(prompt, input) {
   var data = await resp.json();
   if (data.error) throw new Error(data.error);
   var txt = data.content.map(function(b) { return b.text || ''; }).join('');
-  var s = txt.indexOf('{'), e = txt.lastIndexOf('}');
-  if (s !== -1 && e !== -1) txt = txt.substring(s, e + 1);
+  // Extract JSON block
+  var s = txt.indexOf('{');
+  if (s === -1) throw new Error('JSON not found in response');
+  txt = txt.substring(s);
+  // Remove control chars
   txt = txt.replace(/[\x00-\x08\x0B\x0C\x0E-\x1F\x7F]/g, '');
+  // Balance braces to find valid JSON end
+  var depth = 0, end = -1;
+  for (var i = 0; i < txt.length; i++) {
+    if (txt[i] === '{') depth++;
+    else if (txt[i] === '}') { depth--; if (depth === 0) { end = i; break; } }
+  }
+  if (end === -1) throw new Error('Incomplete JSON response');
+  txt = txt.substring(0, end + 1);
   return JSON.parse(txt);
 }
 
 var RULE = 'Korean Hangul only in all Korean fields. No Chinese or Japanese characters.\n';
 
 async function fetchTranslation(isES, text) {
+  text = stripSpecial(text); if (!text) return {};
   var p = RULE + 'Spanish tutor. JSON only, no markdown.\n' +
-    (isES ? 'Input=Spanish sentence. Return {"translation":"한국어번역"}' : 'Input=Korean sentence. Return {"translation":"Spanish translation"}') +
-    '\nInput: ' + text;
+    (isES
+      ? 'Translate the ENTIRE input Spanish text to Korean. Return {"translation":"전체 한국어 번역"}'
+      : 'Translate the ENTIRE input Korean text to Spanish. Return {"translation":"full Spanish translation"}') +
+    '\nTranslate everything, do not skip any part.\nInput: ' + text;
   var r = await callAPI(p, text);
   return r.translation || '-';
 }
 
 async function fetchCorrection(text) {
+  text = stripSpecial(text); if (!text) return {};
   var p = RULE + 'Spanish tutor. JSON only, no markdown.\n' +
     'Input=Spanish. Check grammar and suggest natural native expressions.\n' +
     'Return: {"original":"원문","errors":[{"error":"오류설명","fix":"수정","desc":"이유"}],"result":"교정문"}\n' +
@@ -261,6 +299,7 @@ async function fetchCorrection(text) {
 }
 
 async function fetchExamples(isES, text) {
+  text = stripSpecial(text); if (!text) return {};
   var p = RULE + 'Spanish tutor. JSON only, no markdown.\n' +
     'Input=' + (isES ? 'Spanish' : 'Korean') + ' sentence.\n' +
     'Provide 3 similar Spanish example sentences on same topic.\n' +
@@ -271,18 +310,26 @@ async function fetchExamples(isES, text) {
 }
 
 async function fetchGrammar(isES, text) {
+  text = stripSpecial(text); if (!text) return {};
   var p = RULE + 'Spanish tutor. JSON only, no markdown.\n' +
-    'Analyze grammar of this ' + (isES ? 'Spanish' : 'Spanish (translated from Korean)') + ' sentence. Concise Korean explanations.\n' +
-    'Return: {"analysis":[{"tag":"주어","desc":"설명"},{"tag":"동사","desc":"설명"},{"tag":"시제","desc":"설명"}],"notes":"핵심문법(30자이내)"}\n' +
+    'Analyze the SPANISH grammar of the input. Concise Korean explanations.\n' +
+    (isES
+      ? 'Input is Spanish. Analyze it directly.'
+      : 'Input is Korean. First mentally translate it to Spanish, then analyze that Spanish grammar.') + '\n' +
+    'Return: {"analysis":[{"tag":"주어","desc":"스페인어 주어 설명"},{"tag":"동사","desc":"스페인어 동사 설명"},{"tag":"시제","desc":"시제 설명"}],"notes":"핵심 스페인어 문법 노트(30자이내)"}\n' +
     'Input: ' + text;
   return await callAPI(p, text);
 }
 
 async function fetchVerbs(isES, text) {
+  text = stripSpecial(text); if (!text) return {};
   var conj = '[{"pronoun":"yo","form":""},{"pronoun":"tu","form":""},{"pronoun":"el/ella","form":""},{"pronoun":"nosotros","form":""},{"pronoun":"vosotros","form":""},{"pronoun":"ellos","form":""}]';
   var p = RULE + 'Spanish tutor. JSON only, no markdown.\n' +
-    'Find main verbs in this ' + (isES ? 'Spanish' : 'Korean') + ' sentence and provide present tense conjugation.\n' +
-    'Return: {"verbs":[{"infinitive":"원형","meaning":"한국어뜻","explanation":"시제설명","conjugations":' + conj + '}]}\n' +
+    (isES
+      ? 'Find main Spanish verbs in this Spanish sentence.'
+      : 'Input is Korean. Find the main verbs and provide their Spanish equivalents.') + '\n' +
+    'Provide present tense conjugation for each verb.\n' +
+    'Return: {"verbs":[{"infinitive":"스페인어원형","meaning":"한국어뜻","explanation":"이 문장에서의 시제/용법 설명","conjugations":' + conj + '}]}\n' +
     'Input: ' + text;
   var r = await callAPI(p, text);
   return r.verbs || [];
@@ -351,6 +398,7 @@ function renderGram(gramData, suffix) {
 async function doTranslate(mode) {
   var raw = document.getElementById('ta-' + mode).value.trim();
   if (!raw) return;
+  if (!checkLines(document.getElementById('ta-' + mode))) return;
   var isES = mode === 'es';
   var btn = document.getElementById('btn-' + mode);
   btn.disabled = true;
