@@ -20,7 +20,7 @@ exports.handler = async (event) => {
     const body = JSON.parse(event.body);
     const prompt = body.system + '\n\n사용자 입력: ' + body.messages[0].content;
 
-    const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-04-17:generateContent?key=${API_KEY}`;
+    const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-05-20:generateContent?key=${API_KEY}`;
 
     const response = await fetch(url, {
       method: 'POST',
