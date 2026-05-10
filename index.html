@@ -344,19 +344,24 @@ function getESPrompt(text) {
 }
 
 function getKOPrompt(text) {
-  return 'CRITICAL RULES:\n' +
-    '1. "translation" field: Translate EVERY line of the Korean input to Spanish. Use Latin alphabet only. NEVER skip any line. Preserve line breaks with \\n.\n' +
-    '2. "native_text" field: MUST be written in Spanish using Latin alphabet. NEVER use Korean characters here.\n' +
-    '3. "tag", "desc", "native_tip", "meaning" fields: write in Korean Hangul.\n' +
-    '4. "infinitive", "pronoun", "form" fields: write in Spanish Latin alphabet.\n\n' +
-    'Spanish tutor. JSON only, no markdown.\n' +
-    'Translate ALL lines of this Korean text to Spanish completely. Do not skip any sentence.\n' +
-    'Return this exact JSON structure:\n' +
-    '{"translation":"[Spanish text here using Latin letters]",' +
-    '"native_text":"[More natural Spanish expression using Latin letters]",' +
-    '"native_tip":"[한국어로 차이점 설명]",' +
-    '"grammar":[{"tag":"문법표현","desc":"한국어설명"},{"tag":"시제","desc":"한국어설명"},{"tag":"표현법","desc":"한국어설명"}],' +
-    '"key_verb":{"infinitive":"Spanish verb","meaning":"한국어뜻",' +
+  return 'You are a Spanish tutor. JSON only, no markdown.\n' +
+    'STEP 1: Translate the Korean input into Spanish (Latin alphabet only).\n' +
+    'STEP 2: Suggest a more natural Spanish expression a native speaker would say.\n' +
+    'STEP 3: Analyze the grammar of the SPANISH TRANSLATION (NOT the Korean input). Explain Spanish grammar points in Korean.\n\n' +
+    'STRICT FIELD RULES:\n' +
+    '- "translation": Spanish text only (Latin alphabet). Translate every line. Preserve line breaks with \\n.\n' +
+    '- "native_text": Spanish text only (Latin alphabet). A more natural Spanish version.\n' +
+    '- "native_tip": Korean explanation of the difference (20 chars max).\n' +
+    '- "grammar[].tag": Short Korean label for the Spanish grammar point (e.g. 날씨표현, 접속법, 전치사).\n' +
+    '- "grammar[].desc": Korean explanation of the SPANISH grammar. Do NOT explain Korean grammar.\n' +
+    '- "key_verb.infinitive": Spanish infinitive (Latin alphabet).\n' +
+    '- "key_verb.meaning": Korean meaning.\n\n' +
+    'Return JSON:\n' +
+    '{"translation":"Spanish here",' +
+    '"native_text":"Spanish here",' +
+    '"native_tip":"한국어",' +
+    '"grammar":[{"tag":"스페인어문법태그","desc":"스페인어 문법 설명 한국어로"},{"tag":"시제","desc":"설명"},{"tag":"표현법","desc":"설명"}],' +
+    '"key_verb":{"infinitive":"Spanish","meaning":"한국어",' +
     '"conjugations":[{"pronoun":"yo","form":""},{"pronoun":"tú","form":""},{"pronoun":"él/ella","form":""},{"pronoun":"nosotros","form":""},{"pronoun":"vosotros","form":""},{"pronoun":"ellos","form":""}]}}\n' +
     'Korean input: ' + text;
 }
@@ -378,7 +383,7 @@ function renderCorr(c) {
   }
   if (c.native_text) {
     h += '<div class="native-box"><div class="native-lbl">원어민 표현</div>';
-    h += '<div class="native-txt">' + c.native_text + '</div>';
+    h += '<div class="native-txt">' + dedupText(c.native_text) + '</div>';
     if (c.native_sub) h += '<div class="native-sub">' + c.native_sub + '</div>';
     h += '</div>';
   }
@@ -448,7 +453,7 @@ async function doTranslate(mode) {
       transKo.textContent = dedupText(p.translation || '-');
       if (p.native_text) {
         var nb = '<div class="native-box"><div class="native-lbl">원어민 표현</div>';
-        nb += '<div class="native-txt">' + p.native_text + '</div>';
+        nb += '<div class="native-txt">' + dedupText(p.native_text) + '</div>';
         if (p.native_tip) nb += '<div class="native-sub">' + p.native_tip + '</div>';
         nb += '</div>';
         setHTML('r-native-ko', nb);
