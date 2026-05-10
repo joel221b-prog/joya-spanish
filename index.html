@@ -272,11 +272,15 @@ async function callAPI(prompt, input) {
 // 번역 (해석)
 async function fetchTranslation(isES, text) {
   var p = RULE + 'Spanish tutor. JSON only.\n' +
-    (isES ? 'Translate ALL of this Spanish text to Korean. Return {"translation":"전체한국어번역"}'
-           : 'Translate ALL of this Korean text to Spanish. Return {"translation":"full Spanish translation"}') +
-    '\nTranslate every sentence completely.\nInput: ' + text;
+    (isES
+      ? 'Translate ALL of this Spanish text to Korean. Preserve line breaks with \\n. Return {"translation":"전체한국어번역"}'
+      : 'Translate ALL of this Korean text to Spanish. Preserve line breaks with \\n. Return {"translation":"full Spanish translation"}') +
+    '\nTranslate every sentence. Keep original line structure.\nInput: ' + text;
   var r = await callAPI(p, text);
-  return r.translation || '-';
+  var t = r.translation || '-';
+  // \n 문자열을 실제 줄바꿈으로 변환
+  t = t.replace(/\\n/g, '\n');
+  return t;
 }
 
 // 교정 (ES only)
@@ -300,10 +304,17 @@ async function fetchGrammarAndVerbs(isES, text, esTranslation) {
       'Return: {"analysis":[],"verbs":[{"infinitive":"Spanish verb","meaning":"한국어뜻","explanation":"한국어설명20자이내","conjugations":' + conj + '}],"notes":""}\nSpanish input: ' + target;
     return await callAPI(p, target);
   } else {
-    var p = RULE + 'Spanish tutor. JSON only. Korean explanations only.\n' +
-      'Analyze this Spanish sentence. Return EXACTLY 3 analysis items (주어, 동사, 시제 only). Spanish infinitive only.\n' +
-      'Return: {"analysis":[{"tag":"주어","desc":"주어설명20자이내"},{"tag":"동사","desc":"동사설명20자이내"},{"tag":"시제","desc":"시제설명20자이내"}],' +
-      '"verbs":[{"infinitive":"Spanish","meaning":"한국어뜻","explanation":"한국어설명20자이내","conjugations":' + conj + '}],"notes":"핵심문법30자이내"}\nSpanish input: ' + target;
+    var p = RULE + 'Spanish tutor. JSON only. All explanations in Korean (한국어).\n' +
+      'Analyze the KEY GRAMMAR EXPRESSIONS in this Spanish sentence.\n' +
+      'Focus on: verb tense/mood, ser vs estar, por vs para, subjunctive, reflexive verbs, prepositions, idioms, etc.\n' +
+      'Pick the 2-4 most important grammar points. Be specific and educational.\n' +
+      'Return: {"analysis":[' +
+      '{"tag":"문법표현","desc":"구체적인 문법 설명 (예: poder+동사원형 = ~할 수 있다)"},' +
+      '{"tag":"시제","desc":"사용된 시제와 이유 설명"},' +
+      '{"tag":"표현법","desc":"이 표현을 쓰는 상황이나 뉘앙스"}],' +
+      '"verbs":[{"infinitive":"실제스페인어동사원형","meaning":"한국어뜻","explanation":"이 문장에서의 시제와 용법","conjugations":' + conj + '}],' +
+      '"notes":"이 문장에서 꼭 알아야 할 핵심 문법 한 문장"}\n' +
+      'Spanish input: ' + target;
     return await callAPI(p, target);
   }
 }
