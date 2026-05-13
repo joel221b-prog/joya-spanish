@@ -55,76 +55,6 @@ function WIcon({t,size=15}){
   return <Cloud size={size} strokeWidth={1.8} color={C.inkLight}/>;
 }
 
-/* ── DatePicker: Chrome/iOS/Samsung 모두 지원 ── */
-function DatePicker({selectedDate,onChange}){
-  const inputRef = useRef(null);
-
-  const toValue = d => {
-    if(!(d instanceof Date)) return "";
-    return [d.getFullYear(), String(d.getMonth()+1).padStart(2,"0"),
-            String(d.getDate()).padStart(2,"0")].join("-");
-  };
-
-  const handleChange = e => {
-    if(!e.target.value) return;
-    const [y,m,d] = e.target.value.split("-").map(Number);
-    const date = new Date(y, m-1, d);
-    date.setHours(0,0,0,0);
-    onChange(date);
-  };
-
-  /* 클릭 시 showPicker() 호출 (Chrome) — input 직접 탭(iOS)도 동작 */
-  const handleClick = e => {
-    e.preventDefault();
-    if(!inputRef.current) return;
-    try { inputRef.current.showPicker(); }
-    catch { inputRef.current.click(); }
-  };
-
-  return(
-    <div
-      role="button"
-      tabIndex={0}
-      onClick={handleClick}
-      onKeyDown={e=>{ if(e.key==="Enter"||e.key===" ") handleClick(e); }}
-      style={{position:"relative",display:"inline-block",cursor:"pointer"}}
-    >
-      {/* 시각 레이어 */}
-      <div style={{
-        display:"flex",alignItems:"center",gap:6,
-        background:C.white,border:`1.5px solid ${C.inkFaint}`,
-        borderRadius:10,padding:"8px 14px",
-        color:C.inkMid,fontSize:14,fontWeight:600,
-        boxShadow:"0 1px 4px rgba(0,0,0,0.05)",
-        pointerEvents:"none",userSelect:"none",whiteSpace:"nowrap",
-      }}>
-        <Calendar size={14} strokeWidth={2} color={C.deep}/>
-        날짜 선택
-        <ChevronDown size={13} strokeWidth={2.5} color={C.inkLight}/>
-      </div>
-      {/* input: opacity 0.01로 탭 가능, iOS Safari 호환 */}
-      <input
-        ref={inputRef}
-        type="date"
-        value={toValue(selectedDate)}
-        onChange={handleChange}
-        onClick={e=>e.stopPropagation()} /* 버블링 방지 */
-        style={{
-          position:"absolute",
-          top:0,left:0,
-          width:"100%",height:"100%",
-          opacity:0.01,     /* 0이면 iOS 터치 무시 */
-          cursor:"pointer",
-          fontSize:16,      /* iOS 자동 확대 방지 */
-          border:"none",
-          background:"transparent",
-          zIndex:1,
-        }}
-      />
-    </div>
-  );
-}
-
 /* ── 메인 ── */
 export default function App(){
   const todayBaseRef=useRef(null);
@@ -245,7 +175,7 @@ export default function App(){
     ? `파고 ${realWeather.waveH}m`
     : "파고 -";
 
-  const dateLabel=isToday?"오늘":selDate.toLocaleDateString("ko-KR",{month:"long",day:"numeric",weekday:"short"});
+
 
   const badge=allCancelled  ?{label:"전편 결항",color:C.red,   bg:C.redLight,   border:"rgba(192,57,43,0.25)"}
              :someCancelled  ?{label:"일부 결항",color:C.orange,bg:C.orangeLight,border:"rgba(208,96,32,0.25)"}
@@ -486,7 +416,6 @@ export default function App(){
                   const isActive=item.status==="운항중";
                   const isNext  =item.status==="예정";
                   const isCancel=item.status==="결항";
-                  const isOpen  =expanded===item.id;
 
                   const dotColor=isCancel?C.red:isActive?C.deep:isNext?C.goldAccent:C.done;
                   const timeColor=isCancel?C.done:isActive?C.deep:isNext?C.inkLight:C.done;
